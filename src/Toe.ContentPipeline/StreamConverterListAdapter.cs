@@ -12,15 +12,12 @@ namespace Toe.ContentPipeline
         }
 
 
-        public override int Count
-        {
-            get { return list.Count; }
-        }
+        public override int Count => list.Count;
 
         public override T this[int index]
         {
-            get { return list[index]; }
-            set { list[index] = value; }
+            get => list[index];
+            set => list[index] = value;
         }
 
         public override void CopyTo(T[] array, int arrayIndex)

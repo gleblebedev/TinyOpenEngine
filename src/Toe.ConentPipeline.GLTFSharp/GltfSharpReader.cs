@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -57,78 +56,101 @@ namespace Toe.ConentPipeline.GLTFSharp
         {
             var gpuMesh = new GpuMesh(id);
             gpuMesh.Primitives.Capacity = mesh.Primitives.Count;
-            var accessorCollection = new AccessorCollection();
+            var meshStreamsCollection = new MeshStreamsCollection();
+
+            foreach (var primitive in mesh.Primitives)
+            foreach (var vertexAccessor in primitive.VertexAccessors)
+            {
+                var key = vertexAccessor.Key;
+                var accessor = vertexAccessor.Value;
+                meshStreamsCollection.Register(key, accessor);
+            }
+            //for (var targetIndex = 0; targetIndex < primitive.MorphTargetsCount; ++targetIndex)
+            //{
+            //    foreach (var vertexAccessor in primitive.GetMorphTargetAccessors(targetIndex))
+            //    {
+            //        var key = "TARGET_"+vertexAccessor.Key+ targetIndex;
+            //        var accessor = vertexAccessor.Value;
+            //        accessorCollection.Register(key, accessor)
+            //    }
+            //}
+
             foreach (var primitive in mesh.Primitives)
             {
-                foreach (var vertexAccessor in primitive.VertexAccessors)
-                {
-                    var key = vertexAccessor.Key;
-                    var accessor = vertexAccessor.Value;
-                    accessorCollection.Add(key, accessor);
-                }
+                gpuMesh.Primitives.Add(TransformPrimitive(primitive, meshStreamsCollection.First().Value.Count));
 
-                //for (var targetIndex = 0; targetIndex < primitive.MorphTargetsCount; ++targetIndex)
-                //{
-                //    foreach (var vertexAccessor in primitive.GetMorphTargetAccessors(targetIndex))
-                //    {
-                //        var key = "TARGET_"+vertexAccessor.Key+ targetIndex;
-                //        var accessor = vertexAccessor.Value;
-                //        accessorCollection.Add(key, accessor)
-                //    }
-                //}
-
-                gpuMesh.Primitives.Add(TransformPrimitive(gpuMesh, primitive));
+                foreach (var keyAndStream in meshStreamsCollection)
+                    if (primitive.VertexAccessors.TryGetValue(keyAndStream.Key, out var accessor))
+                    {
+                        switch (accessor.Dimensions)
+                        {
+                            case DimensionType.SCALAR:
+                                ((IMeshStream<float>) keyAndStream.Value).AddRange(accessor.AsScalarArray());
+                                break;
+                            case DimensionType.VEC2:
+                                ((IMeshStream<Vector2>) keyAndStream.Value).AddRange(accessor.AsVector2Array());
+                                break;
+                            case DimensionType.VEC3:
+                                ((IMeshStream<Vector3>) keyAndStream.Value).AddRange(accessor.AsVector3Array());
+                                break;
+                            case DimensionType.VEC4:
+                                ((IMeshStream<Vector4>) keyAndStream.Value).AddRange(accessor.AsVector4Array());
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                    else
+                    {
+                        var items = primitive.VertexAccessors.First().Value.Count;
+                        keyAndStream.Value.AddDefault(items);
+                    }
             }
 
-            foreach (var accessor in accessorCollection)
-            {
-                gpuMesh.SetStream(GetStreamKey(accessor.Key), TransformAccessor(accessor.Value));
-            }
+            foreach (var accessor in meshStreamsCollection)
+                gpuMesh.SetStream(GetStreamKey(accessor.Key), accessor.Value);
             return gpuMesh;
-        }
-
-        private IMeshStream TransformAccessor(Accessor accessor)
-        {
-            switch (accessor.Dimensions)
-            {
-                case DimensionType.SCALAR:
-                    return new ListMeshStream<float>( accessor.AsScalarArray());
-                case DimensionType.VEC2:
-                    return new ListMeshStream<Vector2>(accessor.AsVector2Array());
-                case DimensionType.VEC3:
-                    return new ListMeshStream<Vector3>(accessor.AsVector3Array());
-                case DimensionType.VEC4:
-                    return new ListMeshStream<Vector4>(accessor.AsVector4Array());
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
         }
 
         private StreamKey GetStreamKey(string key)
         {
-            if (key.Length > 2 && key[key.Length-2] == '_' && char.IsDigit(key[key.Length - 1]))
-                return new StreamKey(key.Substring(0,key.Length-2), int.Parse(key.Substring(key.Length-1), CultureInfo.InvariantCulture));
+            if (key.Length > 2 && key[key.Length - 2] == '_' && char.IsDigit(key[key.Length - 1]))
+                return new StreamKey(key.Substring(0, key.Length - 2),
+                    int.Parse(key.Substring(key.Length - 1), CultureInfo.InvariantCulture));
             return new StreamKey(key, 0);
         }
 
-        private GpuPrimitive TransformPrimitive(GpuMesh gpuMesh, MeshPrimitive primitive)
+        private GpuPrimitive TransformPrimitive(MeshPrimitive primitive, int indexOffset)
         {
             switch (primitive.DrawPrimitiveType)
             {
                 case PrimitiveType.TRIANGLES:
-                    return new GpuPrimitive(PrimitiveTopology.TriangleList, primitive.GetTriangleIndices().SelectMany(_ => new[] { _.Item1, _.Item2, _.Item3 }));
+                    return new GpuPrimitive(PrimitiveTopology.TriangleList,
+                        primitive.GetTriangleIndices().SelectMany(_ => new[] {_.Item1, _.Item2, _.Item3})
+                            .Select(_ => _ + indexOffset));
                 case PrimitiveType.TRIANGLE_STRIP:
-                    return new GpuPrimitive(PrimitiveTopology.TriangleList, primitive.GetTriangleIndices().SelectMany(_ => new[] { _.Item1, _.Item2, _.Item3 }));
+                    return new GpuPrimitive(PrimitiveTopology.TriangleList,
+                        primitive.GetTriangleIndices().SelectMany(_ => new[] {_.Item1, _.Item2, _.Item3})
+                            .Select(_ => _ + indexOffset));
                 case PrimitiveType.TRIANGLE_FAN:
-                    return new GpuPrimitive(PrimitiveTopology.TriangleList, primitive.GetTriangleIndices().SelectMany(_ => new[] { _.Item1, _.Item2, _.Item3 }));
+                    return new GpuPrimitive(PrimitiveTopology.TriangleList,
+                        primitive.GetTriangleIndices().SelectMany(_ => new[] {_.Item1, _.Item2, _.Item3})
+                            .Select(_ => _ + indexOffset));
                 case PrimitiveType.POINTS:
-                    return new GpuPrimitive(PrimitiveTopology.PointList, primitive.GetPointIndices());
+                    return new GpuPrimitive(PrimitiveTopology.PointList,
+                        primitive.GetPointIndices().Select(_ => _ + indexOffset));
                 case PrimitiveType.LINES:
-                    return new GpuPrimitive(PrimitiveTopology.LineList, primitive.GetLineIndices().SelectMany(_ => new[] { _.Item1, _.Item2}));
+                    return new GpuPrimitive(PrimitiveTopology.LineList,
+                        primitive.GetLineIndices().SelectMany(_ => new[] {_.Item1, _.Item2})
+                            .Select(_ => _ + indexOffset));
                 case PrimitiveType.LINE_STRIP:
-                    return new GpuPrimitive(PrimitiveTopology.LineList, primitive.GetLineIndices().SelectMany(_ => new[] { _.Item1, _.Item2 }));
+                    return new GpuPrimitive(PrimitiveTopology.LineList,
+                        primitive.GetLineIndices().SelectMany(_ => new[] {_.Item1, _.Item2})
+                            .Select(_ => _ + indexOffset));
                 case PrimitiveType.LINE_LOOP:
-                    return new GpuPrimitive(PrimitiveTopology.LineList, primitive.GetLineIndices().SelectMany(_ => new[] { _.Item1, _.Item2 }));
+                    return new GpuPrimitive(PrimitiveTopology.LineList,
+                        primitive.GetLineIndices().SelectMany(_ => new[] {_.Item1, _.Item2})
+                            .Select(_ => _ + indexOffset));
                 default:
                     throw new ArgumentOutOfRangeException();
             }

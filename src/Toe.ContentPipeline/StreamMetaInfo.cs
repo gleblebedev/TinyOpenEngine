@@ -18,14 +18,7 @@ namespace Toe.ContentPipeline
 
         bool IEquatable<StreamMetaInfo>.Equals(StreamMetaInfo other)
         {
-            return Equals((IStreamMetaInfo)other);
-        }
-        public bool Equals(IStreamMetaInfo other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return ValueType.Equals(other.ValueType) && ComponentsPerSet == other.ComponentsPerSet &&
-                   NumberOfSets == other.NumberOfSets && BaseType.Equals(other.BaseType);
+            return Equals(other);
         }
 
         public Type ValueType { get; }
@@ -36,12 +29,20 @@ namespace Toe.ContentPipeline
 
         public Type BaseType { get; }
 
+        public bool Equals(IStreamMetaInfo other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return ValueType.Equals(other.ValueType) && ComponentsPerSet == other.ComponentsPerSet &&
+                   NumberOfSets == other.NumberOfSets && BaseType.Equals(other.BaseType);
+        }
+
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             var other = obj as IStreamMetaInfo;
-            return other != null && this.Equals(other);
+            return other != null && Equals(other);
         }
 
         public override int GetHashCode()

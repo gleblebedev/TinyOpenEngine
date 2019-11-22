@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Toe.Math\Toe.Math.csproj" />
     <ProjectReference Include="..\Toe.SceneGraph\Toe.SceneGraph.csproj" />
   </ItemGroup>
 

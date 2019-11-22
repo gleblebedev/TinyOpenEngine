@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Toe.ContentPipeline
+﻿namespace Toe.ContentPipeline
 {
     public interface IMeshPrimitive
     {

@@ -5,6 +5,6 @@ namespace Toe.ContentPipeline
 {
     public interface IFileWriter
     {
-        Task WriteAsync(Stream stream);
+        Task WriteAsync(Stream stream, IContentContainer content);
     }
 }

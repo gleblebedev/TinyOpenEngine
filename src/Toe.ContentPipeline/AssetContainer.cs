@@ -32,26 +32,27 @@ namespace Toe.ContentPipeline
 
         public void Add(T asset)
         {
+            if (asset.Id == null) asset.Id = $"{typeof(T).Name}{_list.Count}";
             _map.Add(asset.Id, asset);
             _list.Add(asset);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             return ((IEnumerable<T>) _list).GetEnumerator();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable) _list).GetEnumerator();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         IEnumerator<KeyValuePair<string, T>> IEnumerable<KeyValuePair<string, T>>.GetEnumerator()
         {
             return ((IDictionary<string, T>) _map).GetEnumerator();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable<T>) _list).GetEnumerator();
         }
 
         int IReadOnlyCollection<KeyValuePair<string, T>>.Count

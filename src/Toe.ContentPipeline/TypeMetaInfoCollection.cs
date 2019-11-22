@@ -13,30 +13,25 @@ namespace Toe.ContentPipeline
             ConvertorCollection v;
             if (!map.TryGetValue(key, out v))
             {
-                v = new ConvertorCollection<T> { MetaInfo = streamMetaInfo };
+                v = new ConvertorCollection<T> {MetaInfo = streamMetaInfo};
                 map.Add(key, v);
             }
+
             v.MetaInfo = streamMetaInfo;
-            return (ConvertorCollection<T>)v;
+            return (ConvertorCollection<T>) v;
         }
 
         public ConvertorCollection<T>.ConverterFactory<TRes> ResolveConverter<T, TRes>()
         {
             ConvertorCollection v;
-            if (map.TryGetValue(typeof(T), out v))
-            {
-                return ((ConvertorCollection<T>)v).ResolveConverter<TRes>();
-            }
+            if (map.TryGetValue(typeof(T), out v)) return ((ConvertorCollection<T>) v).ResolveConverter<TRes>();
             return null;
         }
 
         public IStreamMetaInfo GetMetaInfo(Type key)
         {
             ConvertorCollection v;
-            if (map.TryGetValue(key, out v))
-            {
-                return v.MetaInfo;
-            }
+            if (map.TryGetValue(key, out v)) return v.MetaInfo;
             return null;
         }
 
@@ -54,6 +49,7 @@ namespace Toe.ContentPipeline
                     v.MetaInfo = convertorCollection.Value.MetaInfo;
                     map.Add(convertorCollection.Key, v);
                 }
+
                 v.CopyFrom(convertorCollection.Value);
             }
         }

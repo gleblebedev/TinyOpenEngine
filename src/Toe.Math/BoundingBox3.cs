@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 
@@ -85,10 +86,10 @@ namespace Toe
                 return this;
             return new BoundingBox3
             {
-                _min = new Vector3(System.Math.Min(Min.X, right.Min.X), System.Math.Min(Min.Y, right.Min.Y),
-                    System.Math.Min(Min.Z, right.Min.Z)),
-                _max = new Vector3(System.Math.Max(Max.X, right.Max.X), System.Math.Max(Max.Y, right.Max.Y),
-                    System.Math.Max(Max.Z, right.Max.Z))
+                _min = new Vector3(Math.Min(Min.X, right.Min.X), Math.Min(Min.Y, right.Min.Y),
+                    Math.Min(Min.Z, right.Min.Z)),
+                _max = new Vector3(Math.Max(Max.X, right.Max.X), Math.Max(Max.Y, right.Max.Y),
+                    Math.Max(Max.Z, right.Max.Z))
             };
         }
 
@@ -109,11 +110,11 @@ namespace Toe
             res = new BoundingBox3
             {
                 _min =
-                    new Vector3(System.Math.Min(Min.X, right.Min.X), System.Math.Min(Min.Y, right.Min.Y),
-                        System.Math.Min(Min.Z, right.Min.Z)),
+                    new Vector3(Math.Min(Min.X, right.Min.X), Math.Min(Min.Y, right.Min.Y),
+                        Math.Min(Min.Z, right.Min.Z)),
                 _max =
-                    new Vector3(System.Math.Max(Max.X, right.Max.X), System.Math.Max(Max.Y, right.Max.Y),
-                        System.Math.Max(Max.Z, right.Max.Z))
+                    new Vector3(Math.Max(Max.X, right.Max.X), Math.Max(Max.Y, right.Max.Y),
+                        Math.Max(Max.Z, right.Max.Z))
             };
         }
 
@@ -123,10 +124,10 @@ namespace Toe
                 return new BoundingBox3 {_min = right, _max = right};
             return new BoundingBox3
             {
-                _min = new Vector3(System.Math.Min(Min.X, right.X), System.Math.Min(Min.Y, right.Y),
-                    System.Math.Min(Min.Z, right.Z)),
-                _max = new Vector3(System.Math.Max(Max.X, right.X), System.Math.Max(Max.Y, right.Y),
-                    System.Math.Max(Max.Z, right.Z))
+                _min = new Vector3(Math.Min(Min.X, right.X), Math.Min(Min.Y, right.Y),
+                    Math.Min(Min.Z, right.Z)),
+                _max = new Vector3(Math.Max(Max.X, right.X), Math.Max(Max.Y, right.Y),
+                    Math.Max(Max.Z, right.Z))
             };
         }
 
@@ -135,13 +136,13 @@ namespace Toe
             return
                 new BoundingBox3(
                     new Vector3(
-                        System.Math.Min(left._min.X, right._min.X),
-                        System.Math.Min(left._min.Y, right._min.Y),
-                        System.Math.Min(left._min.Z, right._min.Z)),
+                        Math.Min(left._min.X, right._min.X),
+                        Math.Min(left._min.Y, right._min.Y),
+                        Math.Min(left._min.Z, right._min.Z)),
                     new Vector3(
-                        System.Math.Max(left._min.X, right._min.X),
-                        System.Math.Max(left._min.Y, right._min.Y),
-                        System.Math.Max(left._min.Z, right._min.Z)));
+                        Math.Max(left._min.X, right._min.X),
+                        Math.Max(left._min.Y, right._min.Y),
+                        Math.Max(left._min.Z, right._min.Z)));
         }
 
         public static BoundingBox3 operator +(BoundingBox3 left, Vector3 right)

@@ -11,20 +11,17 @@ namespace Toe.ContentPipeline
 
         public StreamMetaInfo MetaInfo
         {
-            get { return metaInfo; }
-            set { metaInfo = value; }
+            get => metaInfo;
+            set => metaInfo = value;
         }
 
         public void CopyFrom(ConvertorCollection convertorCollection)
         {
-            foreach (var d in convertorCollection.map)
-            {
-                map[d.Key] = d.Value;
-            }
+            foreach (var d in convertorCollection.map) map[d.Key] = d.Value;
         }
     }
 
-public class ConvertorCollection<T> : ConvertorCollection
+    public class ConvertorCollection<T> : ConvertorCollection
     {
         public delegate StreamConverter<T2> ConverterFactory<T2>(IList<T> arg);
 
@@ -37,17 +34,14 @@ public class ConvertorCollection<T> : ConvertorCollection
         public ConvertorCollection<T> RegisterConverter<T2>(Func<T, T2> converter)
         {
             if (typeof(T) != typeof(T2))
-                map[typeof(T2)] = (ConverterFactory<T2>)((IList<T> x) => new StreamConverterImpl<T, T2>(converter, x));
+                map[typeof(T2)] = (ConverterFactory<T2>) (x => new StreamConverterImpl<T, T2>(converter, x));
             return this;
         }
 
         public ConverterFactory<TDst> ResolveConverter<TDst>()
         {
             Delegate v;
-            if (map.TryGetValue(typeof(TDst), out v))
-            {
-                return (ConverterFactory<TDst>)v;
-            }
+            if (map.TryGetValue(typeof(TDst), out v)) return (ConverterFactory<TDst>) v;
             return null;
         }
     }

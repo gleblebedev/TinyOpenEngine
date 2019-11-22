@@ -12,19 +12,26 @@ namespace Toe.ContentPipeline
             MetaInfo = metaInfo ?? ConverterFactory.GetMetaInfo(typeof(T));
         }
 
-        public ListMeshStream(int capacity, IStreamConverterFactory converterFactory = null, IStreamMetaInfo metaInfo = null)
+        public ListMeshStream(int capacity, IStreamConverterFactory converterFactory = null,
+            IStreamMetaInfo metaInfo = null)
             : base(capacity)
         {
             ConverterFactory = converterFactory ?? StreamConverterFactory.Default;
             MetaInfo = metaInfo ?? ConverterFactory.GetMetaInfo(typeof(T));
         }
-        public ListMeshStream(IEnumerable<T> data, IStreamConverterFactory converterFactory = null, IStreamMetaInfo metaInfo = null)
-            : base()
+
+        public ListMeshStream(IEnumerable<T> data, IStreamConverterFactory converterFactory = null,
+            IStreamMetaInfo metaInfo = null)
         {
             ConverterFactory = converterFactory ?? StreamConverterFactory.Default;
             MetaInfo = metaInfo ?? ConverterFactory.GetMetaInfo(typeof(T));
             AddRange(data);
         }
+
+        public IStreamConverterFactory ConverterFactory { get; set; } = StreamConverterFactory.Default;
+
+        public IStreamMetaInfo MetaInfo { get; }
+
         /// <summary>
         ///     Compare to items in stream.
         /// </summary>
@@ -69,18 +76,11 @@ namespace Toe.ContentPipeline
             return new ListMeshStream<T>(this, ConverterFactory, MetaInfo);
         }
 
-        public IStreamConverterFactory ConverterFactory { get; set; } = StreamConverterFactory.Default;
-
-        public IStreamMetaInfo MetaInfo { get; }
-
         #region Public Methods and Operators
 
         public void EnsureAt(int index)
         {
-            while (Count <= index)
-            {
-                Add(default(T));
-            }
+            while (Count <= index) Add(default);
         }
 
         public override string ToString()
@@ -105,30 +105,34 @@ namespace Toe.ContentPipeline
         {
             var data = items.ToArray();
             var lookup = new int[data.Length];
-            for (var index = 0; index < data.Length; index++)
-            {
-                lookup[index] = index + this.Count;
-            }
-            ((List<T>)this).AddRange(data);
+            for (var index = 0; index < data.Length; index++) lookup[index] = index + Count;
+            ((List<T>) this).AddRange(data);
             return lookup;
         }
+
         public new int Add(T item)
         {
             var v = Count;
-            ((IList<T>)this).Add(item);
+            ((IList<T>) this).Add(item);
             return v;
+        }
+
+        public void AddDefault(int count = 1)
+        {
+            AddRange(Enumerable.Range(0, count).Select(_ => default(T)));
         }
 
         public IList<TValue> GetReader<TValue>()
         {
             if (typeof(TValue) == typeof(T))
-                return (StreamConverter<TValue>)(object)new StreamConverterListAdapter<T>(this);
+                return (StreamConverter<TValue>) (object) new StreamConverterListAdapter<T>(this);
             if (ConverterFactory != null)
             {
                 var resolveConverter = ConverterFactory.ResolveConverter<T, TValue>(this);
                 if (resolveConverter != null)
                     return resolveConverter;
             }
+
             throw new NotImplementedException(string.Format("{0} to {1} converter is not defined", typeof(T).FullName,
                 typeof(TValue).FullName));
         }

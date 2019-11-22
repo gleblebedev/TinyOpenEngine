@@ -40,19 +40,13 @@ namespace Toe.ContentPipeline
 
             #region Public Properties
 
-            public TRes Current
-            {
-                get { return converter[position]; }
-            }
+            public TRes Current => converter[position];
 
             #endregion
 
             #region Explicit Interface Properties
 
-            object IEnumerator.Current
-            {
-                get { return Current; }
-            }
+            object IEnumerator.Current => Current;
 
             #endregion
 
@@ -72,10 +66,7 @@ namespace Toe.ContentPipeline
 
             public bool MoveNext()
             {
-                if (position + 1 >= converter.Count)
-                {
-                    return false;
-                }
+                if (position + 1 >= converter.Count) return false;
                 ++position;
                 return true;
             }
@@ -104,10 +95,7 @@ namespace Toe.ContentPipeline
         /// <returns>
         ///     true if the <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only; otherwise, false.
         /// </returns>
-        public bool IsReadOnly
-        {
-            get { return true; }
-        }
+        public bool IsReadOnly => true;
 
         #endregion
 

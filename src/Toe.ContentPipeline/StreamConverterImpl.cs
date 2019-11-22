@@ -21,15 +21,12 @@ namespace Toe.ContentPipeline
         /// <returns>
         ///     The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.
         /// </returns>
-        public override int Count
-        {
-            get { return source.Count; }
-        }
+        public override int Count => source.Count;
 
         public override TRes this[int index]
         {
-            get { return converter(source[index]); }
-            set { throw new NotImplementedException(); }
+            get => converter(source[index]);
+            set => throw new NotImplementedException();
         }
     }
 }

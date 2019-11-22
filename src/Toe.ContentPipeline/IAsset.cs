@@ -2,6 +2,6 @@
 {
     public interface IAsset
     {
-        string Id { get; }
+        string Id { get; set; }
     }
 }

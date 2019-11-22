@@ -86,5 +86,17 @@ namespace Toe.ContentPipeline
                     container.Add(transform(assets[index], id));
                 }
         }
+
+        public static GpuMesh ToGpuMesh(this IMesh source)
+        {
+            if (source is GpuMesh) return (GpuMesh) source;
+            return GpuMesh.Optimize(source);
+        }
+
+        public static IndexedMesh ToIndexedMesh(this IMesh source)
+        {
+            if (source is IndexedMesh) return (IndexedMesh) source;
+            return IndexedMesh.Optimize(source);
+        }
     }
 }

@@ -18,13 +18,16 @@ namespace Toe.ContentPipeline
     {
         #region Public Properties
 
-        //IStreamConverterFactory ConverterFactory { get; set; }
+        IStreamConverterFactory ConverterFactory { get; set; }
 
-        //IStreamMetaInfo MetaInfo { get; }
+        IStreamMetaInfo MetaInfo { get; }
 
         #endregion
 
         #region Public Methods and Operators
+
+        void AddDefault(int count = 1);
+
 
         IList<TValue> GetReader<TValue>();
 

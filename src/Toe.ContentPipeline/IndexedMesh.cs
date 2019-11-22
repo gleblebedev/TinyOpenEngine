@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Toe.ContentPipeline
 {
-    public abstract class IndexMesh : AbstractMesh<IndexMeshPrimitive>, IMesh
+    public abstract class IndexedMesh : AbstractMesh<IndexMeshPrimitive>, IMesh
     {
-        public IndexMesh(string id) : base(id)
+        public IndexedMesh(string id) : base(id)
         {
         }
 
@@ -18,6 +19,11 @@ namespace Toe.ContentPipeline
                 foreach (var primitive in _primitives) res |= primitive.DeleteStream(key);
             }
             return res;
+        }
+
+        public static IndexedMesh Optimize(IMesh source)
+        {
+            throw new NotImplementedException();
         }
     }
 }

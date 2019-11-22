@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Toe.ContentPipeline
 {
@@ -8,7 +9,16 @@ namespace Toe.ContentPipeline
         {
         }
 
+        public GpuMesh()
+        {
+        }
+
         public List<GpuPrimitive> Primitives => _primitives;
         IList<IMeshPrimitive> IMesh.Primitives => _abstractPrimitives;
+
+        public static GpuMesh Optimize(IMesh source)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -18,32 +18,33 @@ namespace Toe.ContentPipeline
         {
         }
 
-        public DictionaryMeshStream(Func<Value, Key> getKey, IStreamConverterFactory converterFactory, IStreamMetaInfo metaInfo)
+        public DictionaryMeshStream(Func<Value, Key> getKey, IStreamConverterFactory converterFactory,
+            IStreamMetaInfo metaInfo)
             : this(getKey, new Value[0], converterFactory, EqualityComparer<Key>.Default, metaInfo)
         {
         }
 
-        public DictionaryMeshStream(Func<Value, Key> getKey, IEnumerable<Value> data, IStreamConverterFactory converterFactory)
+        public DictionaryMeshStream(Func<Value, Key> getKey, IEnumerable<Value> data,
+            IStreamConverterFactory converterFactory)
             : this(getKey, data, converterFactory, EqualityComparer<Key>.Default)
         {
         }
 
-        public DictionaryMeshStream(Func<Value, Key> getKey, IEnumerable<Value> data, IStreamConverterFactory converterFactory,
+        public DictionaryMeshStream(Func<Value, Key> getKey, IEnumerable<Value> data,
+            IStreamConverterFactory converterFactory,
             IEqualityComparer<Key> comparer)
             : this(getKey, data, converterFactory, comparer, converterFactory.GetMetaInfo(typeof(Value)))
         {
         }
 
-        public DictionaryMeshStream(Func<Value, Key> getKey, IEnumerable<Value> data, IStreamConverterFactory converterFactory,
+        public DictionaryMeshStream(Func<Value, Key> getKey, IEnumerable<Value> data,
+            IStreamConverterFactory converterFactory,
             IEqualityComparer<Key> comparer, IStreamMetaInfo metaInfo)
         {
             _getKey = getKey;
             this.data = new Dictionary<Key, int>(comparer);
             dataList = new List<Value>();
-            foreach (var item in data)
-            {
-                Add(item);
-            }
+            foreach (var item in data) Add(item);
             ConverterFactory = converterFactory ?? StreamConverterFactory.Default;
             this.comparer = comparer;
             MetaInfo = metaInfo ?? ConverterFactory.GetMetaInfo(typeof(Value));
@@ -51,8 +52,12 @@ namespace Toe.ContentPipeline
 
         int IDictionaryMeshStream.Add(object item)
         {
-            return Add((Value)item);
+            return Add((Value) item);
         }
+
+        public IStreamMetaInfo MetaInfo { get; }
+
+        public IStreamConverterFactory ConverterFactory { get; set; }
 
         public IEnumerator<Value> GetEnumerator()
         {
@@ -72,21 +77,15 @@ namespace Toe.ContentPipeline
         public IList<int> AddRange(IEnumerable<Value> items)
         {
             var lookup = new List<int>();
-            foreach (var item in items)
-            {
-                lookup.Add(Add(item));
-            }
+            foreach (var item in items) lookup.Add(Add(item));
             return lookup;
         }
 
         public int Add(Value item)
         {
-            Key key = _getKey(item);
+            var key = _getKey(item);
             int v;
-            if (data.TryGetValue(key, out v))
-            {
-                return v;
-            }
+            if (data.TryGetValue(key, out v)) return v;
             v = dataList.Count;
             dataList.Add(item);
             data.Add(key, v);
@@ -95,7 +94,7 @@ namespace Toe.ContentPipeline
 
         int IList.Add(object value)
         {
-            return Add((Value)value);
+            return Add((Value) value);
         }
 
         bool IList.Contains(object value)
@@ -139,17 +138,16 @@ namespace Toe.ContentPipeline
         /// <returns>New empty list mesh stream.</returns>
         public IMeshStream CreateDictionaryMeshStreamOfTheSameType()
         {
-            return new DictionaryMeshStream<Key, Value>(_getKey, Enumerable.Empty<Value>(), ConverterFactory, comparer, MetaInfo);
+            return new DictionaryMeshStream<Key, Value>(_getKey, Enumerable.Empty<Value>(), ConverterFactory, comparer,
+                MetaInfo);
         }
 
         public IMeshStream Clone()
         {
-            var dictionaryMeshStream = new DictionaryMeshStream<Key, Value>(_getKey, Enumerable.Empty<Value>(), ConverterFactory, comparer, MetaInfo);
-            foreach (var i in data)
-            {
-                dictionaryMeshStream.data[i.Key] = i.Value;
-            }
-            dictionaryMeshStream.dataList.AddRange(this.dataList);
+            var dictionaryMeshStream = new DictionaryMeshStream<Key, Value>(_getKey, Enumerable.Empty<Value>(),
+                ConverterFactory, comparer, MetaInfo);
+            foreach (var i in data) dictionaryMeshStream.data[i.Key] = i.Value;
+            dictionaryMeshStream.dataList.AddRange(dataList);
             return dictionaryMeshStream;
         }
 
@@ -161,7 +159,7 @@ namespace Toe.ContentPipeline
 
         int IList.IndexOf(object value)
         {
-            return IndexOf((Value)value);
+            return IndexOf((Value) value);
         }
 
         void IList.Insert(int index, object value)
@@ -191,41 +189,23 @@ namespace Toe.ContentPipeline
 
         void ICollection.CopyTo(Array array, int index)
         {
-            ((IList)dataList).CopyTo(array, index);
+            ((IList) dataList).CopyTo(array, index);
         }
 
-        public int Count
-        {
-            get { return dataList.Count; }
-        }
+        public int Count => dataList.Count;
 
-        object ICollection.SyncRoot
-        {
-            get { return ((IList)dataList).SyncRoot; }
-        }
+        object ICollection.SyncRoot => ((IList) dataList).SyncRoot;
 
-        bool ICollection.IsSynchronized
-        {
-            get { return ((IList)dataList).IsSynchronized; }
-        }
+        bool ICollection.IsSynchronized => ((IList) dataList).IsSynchronized;
 
-        public bool IsReadOnly
-        {
-            get { return ((IList<Value>)dataList).IsReadOnly; }
-        }
+        public bool IsReadOnly => ((IList<Value>) dataList).IsReadOnly;
 
-        bool IList.IsFixedSize
-        {
-            get { return false; }
-        }
+        bool IList.IsFixedSize => false;
 
         public int IndexOf(Value item)
         {
             int v;
-            if (data.TryGetValue(_getKey(item), out v))
-            {
-                return v;
-            }
+            if (data.TryGetValue(_getKey(item), out v)) return v;
             return -1;
         }
 
@@ -241,33 +221,36 @@ namespace Toe.ContentPipeline
 
         object IList.this[int index]
         {
-            get { return dataList[index]; }
-            set { throw new NotImplementedException("Not supported. Please use Add method."); }
+            get => dataList[index];
+            set => throw new NotImplementedException("Not supported. Please use Add method.");
         }
 
         public Value this[int index]
         {
-            get { return dataList[index]; }
-            set { throw new NotImplementedException("Not supported. Please use Add method."); }
+            get => dataList[index];
+            set => throw new NotImplementedException("Not supported. Please use Add method.");
+        }
+
+        public void AddDefault(int count = 1)
+        {
+            AddRange(Enumerable.Range(0, count).Select(_ => default(Value)));
         }
 
         public IList<TValue> GetReader<TValue>()
         {
             if (typeof(TValue) == typeof(Value))
-                return (StreamConverter<TValue>)(object)new StreamConverterListAdapter<Value>(dataList);
+                return (StreamConverter<TValue>) (object) new StreamConverterListAdapter<Value>(dataList);
             if (ConverterFactory != null)
             {
                 var resolveConverter = ConverterFactory.ResolveConverter<Value, TValue>(this);
                 if (resolveConverter != null)
                     return resolveConverter;
             }
-            throw new NotImplementedException(string.Format("{0} to {1} converter is not defined", typeof(Value).FullName,
+
+            throw new NotImplementedException(string.Format("{0} to {1} converter is not defined",
+                typeof(Value).FullName,
                 typeof(TValue).FullName));
         }
-
-        public IStreamMetaInfo MetaInfo { get; }
-
-        public IStreamConverterFactory ConverterFactory { get; set; }
     }
 
     public class DictionaryMeshStream<T> : IMeshStream<T>, IDictionaryMeshStream
@@ -303,10 +286,7 @@ namespace Toe.ContentPipeline
         {
             this.data = new Dictionary<T, int>(comparer);
             dataList = new List<T>();
-            foreach (var item in data)
-            {
-                Add(item);
-            }
+            foreach (var item in data) Add(item);
             ConverterFactory = converterFactory ?? StreamConverterFactory.Default;
             this.comparer = comparer;
             MetaInfo = metaInfo ?? ConverterFactory.GetMetaInfo(typeof(T));
@@ -314,8 +294,12 @@ namespace Toe.ContentPipeline
 
         int IDictionaryMeshStream.Add(object item)
         {
-            return Add((T)item);
+            return Add((T) item);
         }
+
+        public IStreamMetaInfo MetaInfo { get; }
+
+        public IStreamConverterFactory ConverterFactory { get; set; }
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -335,20 +319,14 @@ namespace Toe.ContentPipeline
         public IList<int> AddRange(IEnumerable<T> items)
         {
             var lookup = new List<int>();
-            foreach (var item in items)
-            {
-                lookup.Add(Add(item));
-            }
+            foreach (var item in items) lookup.Add(Add(item));
             return lookup;
         }
 
         public int Add(T item)
         {
             int v;
-            if (data.TryGetValue(item, out v))
-            {
-                return v;
-            }
+            if (data.TryGetValue(item, out v)) return v;
             v = dataList.Count;
             dataList.Add(item);
             data.Add(item, v);
@@ -357,7 +335,7 @@ namespace Toe.ContentPipeline
 
         int IList.Add(object value)
         {
-            return Add((T)value);
+            return Add((T) value);
         }
 
         bool IList.Contains(object value)
@@ -406,12 +384,10 @@ namespace Toe.ContentPipeline
 
         public IMeshStream Clone()
         {
-            var dictionaryMeshStream = new DictionaryMeshStream<T>(Enumerable.Empty<T>(), ConverterFactory, comparer, MetaInfo);
-            foreach (var i in data)
-            {
-                dictionaryMeshStream.data[i.Key] = i.Value;
-            }
-            dictionaryMeshStream.dataList.AddRange(this.dataList);
+            var dictionaryMeshStream =
+                new DictionaryMeshStream<T>(Enumerable.Empty<T>(), ConverterFactory, comparer, MetaInfo);
+            foreach (var i in data) dictionaryMeshStream.data[i.Key] = i.Value;
+            dictionaryMeshStream.dataList.AddRange(dataList);
             return dictionaryMeshStream;
         }
 
@@ -423,7 +399,7 @@ namespace Toe.ContentPipeline
 
         int IList.IndexOf(object value)
         {
-            return IndexOf((T)value);
+            return IndexOf((T) value);
         }
 
         void IList.Insert(int index, object value)
@@ -453,41 +429,23 @@ namespace Toe.ContentPipeline
 
         void ICollection.CopyTo(Array array, int index)
         {
-            ((IList)dataList).CopyTo(array, index);
+            ((IList) dataList).CopyTo(array, index);
         }
 
-        public int Count
-        {
-            get { return dataList.Count; }
-        }
+        public int Count => dataList.Count;
 
-        object ICollection.SyncRoot
-        {
-            get { return ((IList)dataList).SyncRoot; }
-        }
+        object ICollection.SyncRoot => ((IList) dataList).SyncRoot;
 
-        bool ICollection.IsSynchronized
-        {
-            get { return ((IList)dataList).IsSynchronized; }
-        }
+        bool ICollection.IsSynchronized => ((IList) dataList).IsSynchronized;
 
-        public bool IsReadOnly
-        {
-            get { return ((IList<T>)dataList).IsReadOnly; }
-        }
+        public bool IsReadOnly => ((IList<T>) dataList).IsReadOnly;
 
-        bool IList.IsFixedSize
-        {
-            get { return false; }
-        }
+        bool IList.IsFixedSize => false;
 
         public int IndexOf(T item)
         {
             int v;
-            if (data.TryGetValue(item, out v))
-            {
-                return v;
-            }
+            if (data.TryGetValue(item, out v)) return v;
             return -1;
         }
 
@@ -503,32 +461,34 @@ namespace Toe.ContentPipeline
 
         object IList.this[int index]
         {
-            get { return dataList[index]; }
-            set { throw new NotImplementedException("Not supported. Please use Add method."); }
+            get => dataList[index];
+            set => throw new NotImplementedException("Not supported. Please use Add method.");
         }
 
         public T this[int index]
         {
-            get { return dataList[index]; }
-            set { throw new NotImplementedException("Not supported. Please use Add method."); }
+            get => dataList[index];
+            set => throw new NotImplementedException("Not supported. Please use Add method.");
+        }
+
+        public void AddDefault(int count = 1)
+        {
+            AddRange(Enumerable.Range(0, count).Select(_ => default(T)));
         }
 
         public IList<TValue> GetReader<TValue>()
         {
             if (typeof(TValue) == typeof(T))
-                return (StreamConverter<TValue>)(object)new StreamConverterListAdapter<T>(dataList);
+                return (StreamConverter<TValue>) (object) new StreamConverterListAdapter<T>(dataList);
             if (ConverterFactory != null)
             {
                 var resolveConverter = ConverterFactory.ResolveConverter<T, TValue>(this);
                 if (resolveConverter != null)
                     return resolveConverter;
             }
+
             throw new NotImplementedException(string.Format("{0} to {1} converter is not defined", typeof(T).FullName,
                 typeof(TValue).FullName));
         }
-
-        public IStreamMetaInfo MetaInfo { get; }
-
-        public IStreamConverterFactory ConverterFactory { get; set; }
     }
 }

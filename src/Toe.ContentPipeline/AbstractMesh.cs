@@ -17,6 +17,10 @@ namespace Toe.ContentPipeline
             _abstractPrimitives = new ListProxy<IMeshPrimitive, P>(_primitives);
         }
 
+        public AbstractMesh() : this(null)
+        {
+        }
+
         public IMeshStream GetStream(StreamKey key)
         {
             IMeshStream list;

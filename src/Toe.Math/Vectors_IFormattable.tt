@@ -1,0 +1,110 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+using System;
+using System.Globalization;
+using System.Text;
+
+namespace Toe
+{
+<#
+var types = new []{
+	new { Suffix = "d", ComponentType = "double", Components = 2 },
+	new { Suffix = "d", ComponentType = "double", Components = 3 },
+	new { Suffix = "d", ComponentType = "double", Components = 4 },
+	new { Suffix = "i", ComponentType = "int", Components = 2 },
+	new { Suffix = "i", ComponentType = "int", Components = 3 },
+	new { Suffix = "i", ComponentType = "int", Components = 4 },
+	new { Suffix = "l", ComponentType = "long", Components = 2 },
+	new { Suffix = "l", ComponentType = "long", Components = 3 },
+	new { Suffix = "l", ComponentType = "long", Components = 4 },
+	new { Suffix = "b", ComponentType = "bool", Components = 2 },
+	new { Suffix = "b", ComponentType = "bool", Components = 3 },
+	new { Suffix = "b", ComponentType = "bool", Components = 4 },
+};
+var components = new []{"X","Y","Z","W"};
+foreach (var type in types.Where(_=>_.ComponentType != "bool"))
+{
+	var typeName = "Vector"+type.Components+type.Suffix;
+#>
+	public partial struct <#=typeName#>: IFormattable
+	{
+        /// <summary>
+        /// Returns a String representing this <#=typeName#> instance, using the specified format to format individual elements 
+        /// and the given IFormatProvider.
+        /// </summary>
+        /// <param name="format">The format of individual elements.</param>
+        /// <param name="formatProvider">The format provider to use when formatting elements.</param>
+        /// <returns>The string representation.</returns>
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            StringBuilder sb = new StringBuilder();
+            string separator = NumberFormatInfo.GetInstance(formatProvider).NumberGroupSeparator;
+            sb.Append('<');
+<#
+for (var component=0; component<type.Components; ++component)
+{
+	if (component != 0)
+	{
+#>            sb.Append(' ');
+<#
+	}
+#>            sb.Append(((IFormattable)this.<#=components[component]#>).ToString(format, formatProvider));
+            sb.Append(separator);
+<#
+}
+#>            sb.Append('>');
+            return sb.ToString();
+        }
+
+		/// <summary>
+        /// Returns a String representing this <#=typeName#> instance.
+        /// </summary>
+        /// <returns>The string representation.</returns>
+        public override string ToString()
+        {
+            return ToString("G", CultureInfo.CurrentCulture);
+        }
+	}
+
+<#
+}
+foreach (var type in types.Where(_=>_.ComponentType == "bool"))
+{
+	var typeName = "Vector"+type.Components+type.Suffix;
+#>
+	public partial struct <#=typeName#>
+	{
+		/// <summary>
+        /// Returns a String representing this <#=typeName#> instance.
+        /// </summary>
+        /// <returns>The string representation.</returns>
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            string separator = ",";
+            sb.Append('<');
+<#
+for (var component=0; component<type.Components; ++component)
+{
+	if (component != 0)
+	{
+#>            sb.Append(' ');
+<#
+	}
+#>            sb.Append(this.<#=components[component]#>);
+            sb.Append(separator);
+<#
+}
+#>            sb.Append('>');
+            return sb.ToString();
+        }
+	}
+
+<#
+}
+#>
+}
