@@ -15,6 +15,13 @@ namespace Toe.ContentPipeline
                 return await reader.ReadAsync(stream);
             }
         }
+        public static async Task SaveAsync(this IFileWriter writer, string fileName, IContentContainer container)
+        {
+            using (var stream = File.Open(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                await writer.WriteAsync(stream, container);
+            }
+        }
 
         public static string EnsureUniqueKey<TValue>(this IDictionary<string, TValue> collection, string id)
         {
@@ -38,7 +45,7 @@ namespace Toe.ContentPipeline
             }
         }
 
-        public static void AddRange<A, T>(this IAssetContainer<T> container, IReadOnlyList<A> assets,
+        public static IReadOnlyList<T> AddRange<A, T>(this IAssetContainer<T> container, IReadOnlyList<A> assets,
             Func<A, string> getId, Func<A, string, T> transform) where T : class, IAsset
         {
             var res = new T[assets.Count];
@@ -83,8 +90,12 @@ namespace Toe.ContentPipeline
                     }
 
                     lastKnownAvailableIndex = nameIndex;
-                    container.Add(transform(assets[index], id));
+                    var asset = transform(assets[index], id);
+                    container.Add(asset);
+                    res[index] = asset;
                 }
+
+            return res;
         }
 
         public static GpuMesh ToGpuMesh(this IMesh source)

@@ -4,20 +4,20 @@ using System.Numerics;
 
 namespace Toe.SceneGraph
 {
-    public class Node : NodeContainer
+    public class Node<TEntity> : NodeContainer<TEntity>
     {
-        private readonly NodeComponent _nodeComponent;
-        private readonly Scene _scene;
-        private Node _parent;
+        private readonly Scene<TEntity> _scene;
+        private readonly TEntity _entity;
+        private Node<TEntity> _parent;
 
         private WorldMatrixToken _worldMatrixVersion = WorldMatrixToken.Empty;
         private WorldMatrixToken _worldTransformToken;
 
-        public Node(Scene scene, LocalTransform localTransform, WorldTransform worldTransform)
+        public Node(Scene<TEntity> scene, LocalTransform localTransform, WorldTransform worldTransform, TEntity entity)
         {
             //TODO: Make Node constructor internal
             _scene = scene;
-            _nodeComponent.Node = this;
+            _entity = entity;
             Transform = localTransform;
             Transform.OnUpdate += HandleTransformUpdate;
             Transform.Reset();
@@ -25,12 +25,22 @@ namespace Toe.SceneGraph
             WorldTransform = worldTransform;
             WorldTransform.WorldMatrix = Matrix4x4.Identity;
 
-            Add(this, scene);
+            AddTo(this, scene);
         }
 
         public LocalTransform Transform { get; }
 
-        public Node Parent
+        public Scene<TEntity> Scene
+        {
+            get { return _scene; }
+        }
+
+        public TEntity Entity
+        {
+            get { return _entity; }
+        }
+
+        public Node<TEntity> Parent
         {
             get => _parent;
             set
@@ -49,15 +59,15 @@ namespace Toe.SceneGraph
                     }
 
                     if (_parent != null)
-                        Remove(this, _parent);
+                        RemoveFrom(this, _parent);
                     else
-                        Remove(this, _scene);
+                        RemoveFrom(this, _scene);
 
                     _parent = value;
                     if (_parent != null)
-                        Add(this, _parent);
+                        AddTo(this, _parent);
                     else
-                        Add(this, _scene);
+                        AddTo(this, _scene);
 
                     InvalidateWorldTransform();
                 }
@@ -85,7 +95,7 @@ namespace Toe.SceneGraph
             _worldTransformToken = WorldMatrixToken.Empty;
         }
 
-        private void UpdateSubtreeWorldTransform(WorldMatrixToken updateToken, Queue<Node> updateQueue)
+        private void UpdateSubtreeWorldTransform(WorldMatrixToken updateToken, Queue<Node<TEntity>> updateQueue)
         {
             EnsureWorldTransformIsUpToDate(updateToken);
             if (HasChildren)
@@ -153,8 +163,8 @@ namespace Toe.SceneGraph
 
         public class WorldMatrixUpdateQueue
         {
-            private readonly List<Node> _queue = new List<Node>(128);
-            private readonly Queue<Node> _updateQueue = new Queue<Node>(128);
+            private readonly List<Node<TEntity>> _queue = new List<Node<TEntity>>(128);
+            private readonly Queue<Node<TEntity>> _updateQueue = new Queue<Node<TEntity>>(128);
             private int _updateCounter;
 
             public void Update()
@@ -169,7 +179,7 @@ namespace Toe.SceneGraph
                 }
             }
 
-            public WorldMatrixToken Add(Node node)
+            public WorldMatrixToken Add(Node<TEntity> node)
             {
                 _queue.Add(node);
                 return new WorldMatrixToken(_queue.Count);

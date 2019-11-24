@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -27,13 +28,16 @@ namespace Toe.ConentPipeline.GLTFSharp
             return Task.Run(() => ReadStream(stream));
         }
 
-        private IContentContainer ReadStream(Stream stream)
+        private IContentContainer Read(ModelRoot modelRoot)
         {
-            var container = new ContentContainer();
-            var model = ModelRoot.Read(stream, _readSettings);
-            var skinsPerMesh = new Skin[model.LogicalMeshes.Count];
+            var context = new ReaderContext()
+            {
+                ModelRoot = modelRoot,
+                Container = new ContentContainer(),
+            };
+            var skinsPerMesh = new Skin[context.ModelRoot.LogicalMeshes.Count];
 
-            foreach (var node in model.LogicalNodes)
+            foreach (var node in context.ModelRoot.LogicalNodes)
                 if (node.Mesh != null && node.Skin != null)
                 {
                     if (skinsPerMesh[node.Mesh.LogicalIndex] != null &&
@@ -42,14 +46,35 @@ namespace Toe.ConentPipeline.GLTFSharp
                     skinsPerMesh[node.Mesh.LogicalIndex] = node.Skin;
                 }
 
-            var meshAndSkin = model.LogicalMeshes.Zip(skinsPerMesh, (m, s) => new {Mesh = m, Skin = s}).ToList();
-            container.Meshes.AddRange(meshAndSkin, _ => _.Mesh.Name, (m, id) => TransformMesh(id, m.Mesh, m.Skin));
+            var meshAndSkin = context.ModelRoot.LogicalMeshes.Zip(skinsPerMesh, (m, s) => new { Mesh = m, Skin = s }).ToList();
+            context.Cameras = context.Container.Cameras.AddRange(context.ModelRoot.LogicalCameras, _ => _.Name, (m, id) => TransformCamera(m, id, context));
+            context.Lights = context.Container.Lights.AddRange(context.ModelRoot.LogicalPunctualLights, _ => _.Name, (m, id) => TransformLight(m, id, context));
+            context.Materials = context.Container.Materials.AddRange(context.ModelRoot.LogicalMaterials, _ => _.Name, (m, id) => TransformMaterial(m, id, context));
+            context.Meshes = context.Container.Meshes.AddRange(meshAndSkin, _ => _.Mesh.Name, (m, id) => TransformMesh(id, m.Mesh, m.Skin));
 
-            container.Nodes.AddRange(model.LogicalNodes, _ => _.Name, TransformNode);
+            context.Nodes = context.Container.Nodes.AddRange(context.ModelRoot.LogicalNodes, _ => _.Name, (node, id) => TransformNode(node, id, context));
 
-            container.Scenes.AddRange(model.LogicalScenes, _ => _.Name, TransformScene);
+            context.Container.Scenes.AddRange(context.ModelRoot.LogicalScenes, _ => _.Name, (s, id) => TransformScene(s, id, context));
 
-            return container;
+            return context.Container;
+        }
+
+        private ICameraAsset TransformCamera(Camera o, string id, ReaderContext context)
+        {
+            return new CameraAsset(id);
+        }
+        private ILightAsset TransformLight(PunctualLight o, string id, ReaderContext context)
+        {
+            return new LightAsset(id);
+        }
+        private IMaterialAsset TransformMaterial(Material material, string id, ReaderContext context)
+        {
+            return new MaterialAsset(id);
+        }
+
+        private IContentContainer ReadStream(Stream stream)
+        {
+            return Read(ModelRoot.Read(stream, _readSettings));
         }
 
         private IMesh TransformMesh(string id, Mesh mesh, Skin skin)
@@ -156,16 +181,44 @@ namespace Toe.ConentPipeline.GLTFSharp
             }
         }
 
-        private ISceneAsset TransformScene(Scene scene, string id)
+        private ISceneAsset TransformScene(Scene scene, string id, ReaderContext context)
         {
             var sceneAsset = new SceneAsset(id);
+            foreach (var node in scene.VisualChildren)
+            {
+                var nodeAsset = (NodeAsset)context.Nodes[node.LogicalIndex];
+                sceneAsset.Add(nodeAsset);
+                AttachChildren(node, nodeAsset, context);
+            }
             return sceneAsset;
         }
 
-        private INodeAsset TransformNode(Node node, string id)
+        private void AttachChildren(Node node, NodeAsset parentAsset, ReaderContext context)
+        {
+            foreach (var childNode in node.VisualChildren)
+            {
+                var nodeAsset = (NodeAsset)context.Nodes[childNode.LogicalIndex];
+                nodeAsset.Parent = parentAsset;
+                AttachChildren(childNode, nodeAsset, context);
+            }
+        }
+
+        private INodeAsset TransformNode(Node node, string id, ReaderContext context)
         {
             var nodeAsset = new NodeAsset(id);
             nodeAsset.Transform.Matrix = node.LocalMatrix;
+            if (node.Mesh != null)
+            {
+                nodeAsset.Mesh = new MeshInstance(context.Meshes[node.Mesh.LogicalIndex], node.Mesh.Primitives.Select(_=>context.Materials[_.LogicalIndex]).ToList());
+            }
+            if (node.Camera != null)
+            {
+                nodeAsset.Camera = context.Cameras[node.Camera.LogicalIndex];
+            }
+            if (node.PunctualLight != null)
+            {
+                nodeAsset.Light = context.Cameras[node.PunctualLight.LogicalIndex];
+            }
             return nodeAsset;
         }
     }

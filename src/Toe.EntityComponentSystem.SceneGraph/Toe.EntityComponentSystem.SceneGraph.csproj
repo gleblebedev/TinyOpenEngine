@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Toe.EntityComponentSystem</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Toe.EntityComponentSystem\Toe.EntityComponentSystem.csproj" />
+    <ProjectReference Include="..\Toe.SceneGraph\Toe.SceneGraph.csproj" />
+  </ItemGroup>
+
+</Project>

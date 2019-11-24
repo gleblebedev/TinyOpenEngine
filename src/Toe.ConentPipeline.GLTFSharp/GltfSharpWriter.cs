@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using SharpGLTF.Geometry;
 using SharpGLTF.Scenes;
 using Toe.ContentPipeline;
 
@@ -11,14 +14,32 @@ namespace Toe.ConentPipeline.GLTFSharp
         {
             return Task.Run(() =>
             {
-                var scene = new SceneBuilder();
-                foreach (var sceneAsset in content.Scenes)
+                var scenes = new List<SceneBuilder>();
+                //var meshes = BuildMeshes(content.Meshes);
+                
+                    foreach (var sceneAsset in content.Scenes)
                 {
+                    var scene = new SceneBuilder();
+                    scenes.Add(scene);
+                    foreach (var node in sceneAsset.ChildNodes)
+                    {
+                        var nodeBuilder = new NodeBuilder(node.Id);
+                        nodeBuilder.LocalTransform = node.Transform.Matrix;
+                        if (node.Mesh != null)
+                        {
+                            //scene.AddMesh()
+                        }
+                    }
                 }
 
-                var modelRoot = scene.ToSchema2();
+                var modelRoot = SceneBuilder.ToSchema2(scenes);
                 modelRoot.WriteGLB(stream);
             });
         }
+
+        //private Dictionary<IMesh, IMeshBuilder<>> BuildMeshes(IAssetContainer<IMesh> contentMeshes)
+        //{
+            
+        //}
     }
 }

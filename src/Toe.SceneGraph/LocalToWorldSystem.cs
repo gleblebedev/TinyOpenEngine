@@ -2,11 +2,11 @@
 {
     //TODO: Implement ECS
     //[EcsInject]
-    public class LocalToWorldSystem //: IEcsRunSystem
+    public class LocalToWorldSystem<TEntity> //: IEcsRunSystem
     {
-        private readonly Scene _scene;
+        private readonly Scene<TEntity> _scene;
 
-        public LocalToWorldSystem(Scene scene)
+        public LocalToWorldSystem(Scene<TEntity> scene)
         {
             _scene = scene;
         }

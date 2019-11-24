@@ -2,6 +2,6 @@
 {
     public class NodeComponent
     {
-        public Node Node { get; internal set; }
+        public Node<NodeComponent> Node { get; internal set; }
     }
 }

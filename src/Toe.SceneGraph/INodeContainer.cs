@@ -2,9 +2,9 @@
 
 namespace Toe.SceneGraph
 {
-    public interface INodeContainer
+    public interface INodeContainer<TEntity>
     {
-        IReadOnlyCollection<Node> Children { get; }
+        IReadOnlyCollection<Node<TEntity>> Children { get; }
 
         bool HasChildren { get; }
     }

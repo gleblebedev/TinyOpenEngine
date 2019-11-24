@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Toe.SceneGraph
 {
-    public class Scene : NodeContainer, IDisposable
+    public class Scene<TEntity> : NodeContainer<TEntity>, IDisposable
     {
-        private readonly Node.WorldMatrixUpdateQueue _worldMatrixUpdateQueue = new Node.WorldMatrixUpdateQueue();
+        private readonly Node<TEntity>.WorldMatrixUpdateQueue _worldMatrixUpdateQueue = new Node<TEntity>.WorldMatrixUpdateQueue();
 
         public void Dispose()
         {
         }
 
-        public WorldMatrixToken EnqueueWorldTransformUpdate(Node node)
+        public WorldMatrixToken EnqueueWorldTransformUpdate(Node<TEntity> node)
         {
             return _worldMatrixUpdateQueue.Add(node);
         }
@@ -20,14 +21,22 @@ namespace Toe.SceneGraph
             _worldMatrixUpdateQueue.Update();
         }
 
-        public Node CreateNode(Node parent)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Node<TEntity> CreateNode(Node<TEntity> parent, TEntity entity)
         {
-            return new Node(this, new LocalTransform(), new WorldTransform()) {Parent = parent};
+            return CreateNode(parent, entity, new LocalTransform());
         }
 
-        public Node CreateNodeWithNoTransform(Node parent)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Node<TEntity> CreateNode(Node<TEntity> parent, TEntity entity, LocalTransform localTransform)
         {
-            return new Node(this, null, null) {Parent = parent};
+            return new Node<TEntity>(this, localTransform, (localTransform != null)?new WorldTransform():null, entity) { Parent = parent };
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Node<TEntity> CreateNodeWithNoTransform(Node<TEntity> parent, TEntity entity)
+        {
+            return CreateNode(parent, entity, null);
         }
     }
 }
