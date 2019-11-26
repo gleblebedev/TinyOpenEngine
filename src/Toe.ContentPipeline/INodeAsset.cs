@@ -2,7 +2,7 @@
 
 namespace Toe.ContentPipeline
 {
-    public interface INodeAsset : IAsset
+    public interface INodeAsset : INodeContainer, IAsset
     {
         LocalTransform Transform { get; }
 

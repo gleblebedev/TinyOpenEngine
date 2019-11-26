@@ -1,11 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Toe.SceneGraph;
-
-namespace Toe.ContentPipeline
+﻿namespace Toe.ContentPipeline
 {
-    public interface ISceneAsset : IAsset
+    public interface ISceneAsset : INodeContainer, IAsset
     {
-        IReadOnlyCollection<INodeAsset> ChildNodes { get; }
     }
 }

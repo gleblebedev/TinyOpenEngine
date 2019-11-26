@@ -24,7 +24,15 @@ namespace Toe.ContentPipeline
             }
             node.GraphNode = _sceneGraph.CreateNode(null, node, node.Transform);
         }
-
+        public bool HasChildren
+        {
+            get
+            {
+                if (_sceneGraph == null)
+                    return false;
+                return _sceneGraph.HasChildren;
+            }
+        }
         public IReadOnlyCollection<INodeAsset> ChildNodes { get; }
     }
 }
