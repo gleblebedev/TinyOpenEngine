@@ -2,12 +2,38 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Toe.ContentPipeline
 {
     public static class ExtensionMethods
     {
+        public static void Write(this BinaryWriter binaryWriter, in Vector2 vector)
+        {
+            binaryWriter.Write(vector.X);
+            binaryWriter.Write(vector.Y);
+        }
+        public static void Write(this BinaryWriter binaryWriter, in Vector3 vector)
+        {
+            binaryWriter.Write(vector.X);
+            binaryWriter.Write(vector.Y);
+            binaryWriter.Write(vector.Z);
+        }
+        public static void Write(this BinaryWriter binaryWriter, in Vector4 vector)
+        {
+            binaryWriter.Write(vector.X);
+            binaryWriter.Write(vector.Y);
+            binaryWriter.Write(vector.Z);
+            binaryWriter.Write(vector.W);
+        }
+        public static void Write(this BinaryWriter binaryWriter, in Vector4us vector)
+        {
+            binaryWriter.Write(vector.X);
+            binaryWriter.Write(vector.Y);
+            binaryWriter.Write(vector.Z);
+            binaryWriter.Write(vector.W);
+        }
         public static async Task<IContentContainer> LoadAsync(this IStreamReader reader, string fileName)
         {
             using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))

@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Toe.ContentPipeline
 {
-    public abstract class AbstractMesh<P> : AbstractAsset where P : IMeshPrimitive
+    public abstract class AbstractMesh<P> : AbstractAsset where P:IMeshPrimitive
     {
         protected readonly IList<IMeshPrimitive> _abstractPrimitives;
         protected readonly List<P> _primitives;
 
-        protected readonly Dictionary<StreamKey, IMeshStream> availableStreams =
-            new Dictionary<StreamKey, IMeshStream>();
 
         public AbstractMesh(string id) : base(id)
         {
-            _primitives = new List<P>();
+            _primitives = new List<P>(1);
             _abstractPrimitives = new ListProxy<IMeshPrimitive, P>(_primitives);
         }
 
@@ -21,34 +19,27 @@ namespace Toe.ContentPipeline
         {
         }
 
-        public IMeshStream GetStream(StreamKey key)
+        public IEnumerable<IBufferView> BufferViews
         {
-            IMeshStream list;
-            if (availableStreams.TryGetValue(key, out list)) return list;
-            return null;
+            get
+            {
+                return _primitives.Select(_ => _.BufferView).Distinct();
+            }
         }
 
-        public IEnumerable<StreamKey> GetStreams()
+        public bool DeleteStream(StreamKey key)
         {
-            return availableStreams.Keys;
-        }
+            var res = false;
+            foreach (var primitive in _primitives)
+            {
+                res |= primitive.DeleteStream(key);
+            }
+            foreach (var primitive in _primitives)
+            {
+                res |= primitive.BufferView.DeleteStream(key);
+            }
 
-        public bool HasStream(StreamKey key)
-        {
-            return GetStream(key) != null;
-        }
-
-        public T SetStream<T>(StreamKey key, T stream) where T : class, IMeshStream
-        {
-            if (stream == null)
-                throw new ArgumentNullException("stream", "Stream can't be null");
-            availableStreams[key] = stream;
-            return stream;
-        }
-
-        public virtual bool DeleteStream(StreamKey key)
-        {
-            return availableStreams.Remove(key);
+            return res;
         }
     }
 }

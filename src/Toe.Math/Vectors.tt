@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Toe
@@ -19,6 +20,8 @@ var types = new []{
 	new { Suffix = "i", ComponentType = "int", Components = 2 },
 	new { Suffix = "i", ComponentType = "int", Components = 3 },
 	new { Suffix = "i", ComponentType = "int", Components = 4 },
+	new { Suffix = "us", ComponentType = "ushort", Components = 4 },
+	new { Suffix = "ub", ComponentType = "byte", Components = 4 },
 	new { Suffix = "l", ComponentType = "long", Components = 2 },
 	new { Suffix = "l", ComponentType = "long", Components = 3 },
 	new { Suffix = "l", ComponentType = "long", Components = 4 },
@@ -41,6 +44,23 @@ for (var component=0; component<type.Components; ++component)
         /// The <#=components[component]#> component of the vector.
         /// </summary>
         public <#=type.ComponentType#> <#=components[component]#>;
+<#
+}
+#>
+<#
+if (type.ComponentType != "bool")
+{
+#>
+        public <#=typeName#>(Vector<#=type.Components#> vec)
+        {
+<#
+for (var component=0; component<type.Components; ++component)
+{
+#>            this.<#=components[component]#> = (<#=type.ComponentType#>)vec.<#=components[component]#>;
+<#
+}
+#>
+        }
 <#
 }
 #>

@@ -4,9 +4,8 @@ namespace Toe.ContentPipeline
 {
     public class IndexMeshPrimitive : AbstractPrimitive, IMeshPrimitive
     {
-        public bool DeleteStream(StreamKey key)
+        public IndexMeshPrimitive(IBufferView bufferView) : base(bufferView)
         {
-            throw new NotImplementedException();
         }
     }
 }

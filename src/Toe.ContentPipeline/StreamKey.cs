@@ -2,7 +2,7 @@
 
 namespace Toe.ContentPipeline
 {
-    public struct StreamKey : IEquatable<StreamKey>
+    public struct StreamKey : IEquatable<StreamKey>, IComparable<StreamKey>
     {
         #region Constants and Fields
 
@@ -107,9 +107,18 @@ namespace Toe.ContentPipeline
             }
         }
 
+        /// <summary>Returns the fully qualified type name of this instance.</summary>
+        /// <returns>The fully qualified type name.</returns>
         public override string ToString()
         {
             return string.Format("{0}{1}", Key, Channel);
+        }
+
+        public int CompareTo(StreamKey other)
+        {
+            var keyComparison = string.Compare(Key, other.Key, StringComparison.Ordinal);
+            if (keyComparison != 0) return keyComparison;
+            return Channel.CompareTo(other.Channel);
         }
 
         #endregion

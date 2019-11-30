@@ -7,15 +7,15 @@ namespace Toe.ContentPipeline
     {
         private readonly IReadOnlyList<int> _indices;
 
-        public GpuPrimitive(IEnumerable<int> indices) : this(PrimitiveTopology.TriangleList, indices)
+        public GpuPrimitive(IEnumerable<int> indices, IBufferView bufferView) : this(PrimitiveTopology.TriangleList, indices, bufferView)
         {
         }
 
-        public GpuPrimitive(IReadOnlyList<int> indices) : this(PrimitiveTopology.TriangleList, indices)
+        public GpuPrimitive(IReadOnlyList<int> indices, IBufferView bufferView) : this(PrimitiveTopology.TriangleList, indices, bufferView)
         {
         }
 
-        public GpuPrimitive(PrimitiveTopology topology, IEnumerable<int> indices)
+        public GpuPrimitive(PrimitiveTopology topology, IEnumerable<int> indices, IBufferView bufferView):base(bufferView)
         {
             Topology = topology;
             var list = new List<int>();
@@ -23,7 +23,7 @@ namespace Toe.ContentPipeline
             _indices = list;
         }
 
-        public GpuPrimitive(PrimitiveTopology topology, IReadOnlyList<int> indices)
+        public GpuPrimitive(PrimitiveTopology topology, IReadOnlyList<int> indices, IBufferView bufferView) : base(bufferView)
         {
             Topology = topology;
             _indices = indices;
