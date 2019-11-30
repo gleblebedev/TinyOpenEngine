@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Toe.ContentPipeline;
 
-namespace Toe.ConentPipeline.GLTFSharp.UnitTests
+namespace Toe.ContentPipeline.GLTFSharp.UnitTests
 {
     [TestFixture]
     public class GltfSharpWriterTestFixture

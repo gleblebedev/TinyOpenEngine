@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SharpGLTF.Schema2;
 
-namespace Toe.ConentPipeline.GLTFSharp
+namespace Toe.ContentPipeline.GLTFSharp
 {
     public class BufferViewKey : IEquatable<BufferViewKey>, IEnumerable<BufferStreamKey>
     {

@@ -2,7 +2,7 @@
 using SharpGLTF.Schema2;
 using Toe.ContentPipeline;
 
-namespace Toe.ConentPipeline.GLTFSharp
+namespace Toe.ContentPipeline.GLTFSharp
 {
     public class ReaderContext
     {

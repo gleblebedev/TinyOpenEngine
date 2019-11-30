@@ -1,6 +1,6 @@
 ﻿using Toe.ContentPipeline;
 
-namespace Toe.ConentPipeline.GLTFSharp
+namespace Toe.ContentPipeline.GLTFSharp
 {
     public class GltfSharpFileFormat : IFileFormat
     {

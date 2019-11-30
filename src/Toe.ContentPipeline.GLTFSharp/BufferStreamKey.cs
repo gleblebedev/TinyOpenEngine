@@ -3,7 +3,7 @@ using System.Globalization;
 using SharpGLTF.Schema2;
 using Toe.ContentPipeline;
 
-namespace Toe.ConentPipeline.GLTFSharp
+namespace Toe.ContentPipeline.GLTFSharp
 {
     public class BufferStreamKey : IEquatable<BufferStreamKey>, IComparable<BufferStreamKey>
     {

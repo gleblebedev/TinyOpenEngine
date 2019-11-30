@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Toe.ConentPipeline.GLTFSharp\Toe.ConentPipeline.GLTFSharp.csproj" />
+    <ProjectReference Include="..\Toe.ContentPipeline.GLTFSharp\Toe.ContentPipeline.GLTFSharp.csproj" />
     <ProjectReference Include="..\Toe.ContentPipeline\Toe.ContentPipeline.csproj" />
   </ItemGroup>
 
