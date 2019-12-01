@@ -5,7 +5,6 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using SharpGLTF.Schema2;
-using Toe.ContentPipeline;
 
 namespace Toe.ContentPipeline.GLTFSharp
 {
@@ -113,7 +112,7 @@ namespace Toe.ContentPipeline.GLTFSharp
                         var accessorData = new AccessorData();
                         accessorData.Key = streamKey;
                         accessorData.AttributeKey = GetAttributeKey(streamKey);
-                        accessorData.Source = GetSource(accessorData.AttributeKey, stream);
+                        accessorData.Source = GetSource(accessorData.Key, stream);
                         accessorData.Dimentions = GetDimensionType(stream.MetaInfo);
                         accessorData.Encoding = accessorData.Source.Encoding;
                         accessorData.Normalized = false;
@@ -163,9 +162,9 @@ namespace Toe.ContentPipeline.GLTFSharp
             return mesh;
         }
 
-        private Source GetSource(string key, IMeshStream stream)
+        private Source GetSource(StreamKey key, IMeshStream stream)
         {
-            if (key == "JOINTS_0" || key == "JOINTS_1") return new Vec4USSource(stream);
+            if (key.Key == Streams.Joints) return new Vec4USSource(stream);
             switch (stream.MetaInfo.ComponentsPerSet)
             {
                 case 1:

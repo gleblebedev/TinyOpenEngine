@@ -92,9 +92,9 @@ namespace Toe.ContentPipeline
 
         //public void ModifyAt(int index, ModifyAtFunc<T> func)
         //{
-        //	var v = this[index];
-        //	func(ref v);
-        //	this[index] = v;
+        //    var v = this[index];
+        //    func(ref v);
+        //    this[index] = v;
         //}
 
         #endregion

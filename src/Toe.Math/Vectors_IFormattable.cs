@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Toe
 {
-	public partial struct Vector2d: IFormattable
-	{
+    public partial struct Vector2d: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector2d instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -27,7 +27,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector2d instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -35,10 +35,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector3d: IFormattable
-	{
+    public partial struct Vector3d: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector3d instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -63,7 +63,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector3d instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -71,10 +71,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector4d: IFormattable
-	{
+    public partial struct Vector4d: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector4d instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -102,7 +102,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector4d instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -110,10 +110,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector2i: IFormattable
-	{
+    public partial struct Vector2i: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector2i instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -135,7 +135,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector2i instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -143,10 +143,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector3i: IFormattable
-	{
+    public partial struct Vector3i: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector3i instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -171,7 +171,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector3i instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -179,10 +179,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector4i: IFormattable
-	{
+    public partial struct Vector4i: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector4i instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -210,7 +210,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector4i instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -218,10 +218,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector4us: IFormattable
-	{
+    public partial struct Vector4us: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector4us instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -249,7 +249,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector4us instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -257,10 +257,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector4ub: IFormattable
-	{
+    public partial struct Vector4ub: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector4ub instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -288,7 +288,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector4ub instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -296,10 +296,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector2l: IFormattable
-	{
+    public partial struct Vector2l: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector2l instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -321,7 +321,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector2l instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -329,10 +329,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector3l: IFormattable
-	{
+    public partial struct Vector3l: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector3l instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -357,7 +357,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector3l instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -365,10 +365,10 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector4l: IFormattable
-	{
+    public partial struct Vector4l: IFormattable
+    {
         /// <summary>
         /// Returns a String representing this Vector4l instance, using the specified format to format individual elements 
         /// and the given IFormatProvider.
@@ -396,7 +396,7 @@ namespace Toe
             return sb.ToString();
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a String representing this Vector4l instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -404,11 +404,11 @@ namespace Toe
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
-	}
+    }
 
-	public partial struct Vector2b
-	{
-		/// <summary>
+    public partial struct Vector2b
+    {
+        /// <summary>
         /// Returns a String representing this Vector2b instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -425,11 +425,11 @@ namespace Toe
             sb.Append('>');
             return sb.ToString();
         }
-	}
+    }
 
-	public partial struct Vector3b
-	{
-		/// <summary>
+    public partial struct Vector3b
+    {
+        /// <summary>
         /// Returns a String representing this Vector3b instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -449,11 +449,11 @@ namespace Toe
             sb.Append('>');
             return sb.ToString();
         }
-	}
+    }
 
-	public partial struct Vector4b
-	{
-		/// <summary>
+    public partial struct Vector4b
+    {
+        /// <summary>
         /// Returns a String representing this Vector4b instance.
         /// </summary>
         /// <returns>The string representation.</returns>
@@ -476,6 +476,6 @@ namespace Toe
             sb.Append('>');
             return sb.ToString();
         }
-	}
+    }
 
 }

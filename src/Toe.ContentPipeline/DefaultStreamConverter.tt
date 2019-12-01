@@ -1,0 +1,82 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Toe.ContentPipeline
+{
+    public partial class StreamConverterFactory : IStreamConverterFactory
+    {
+        public static readonly StreamConverterFactory Default;
+
+        static StreamConverterFactory()
+        {
+<#
+var types = new []{
+    new { Name = "float", ComponentType = "float", Components = 1 },
+    new { Name = "Vector2", ComponentType = "float", Components = 2 },
+    new { Name = "Vector3", ComponentType = "float", Components = 3 },
+    new { Name = "Vector4", ComponentType = "float", Components = 4 },
+    new { Name = "Vector2d", ComponentType = "double", Components = 2 },
+    new { Name = "Vector3d", ComponentType = "double", Components = 3 },
+    new { Name = "Vector4d", ComponentType = "double", Components = 4 },
+    new { Name = "Vector2i", ComponentType = "int", Components = 2 },
+    new { Name = "Vector3i", ComponentType = "int", Components = 3 },
+    new { Name = "Vector4i", ComponentType = "int", Components = 4 },
+    new { Name = "Vector4us", ComponentType = "ushort", Components = 4 },
+    new { Name = "Vector4ub", ComponentType = "byte", Components = 4 },
+    new { Name = "Vector2l", ComponentType = "long", Components = 2 },
+    new { Name = "Vector3l", ComponentType = "long", Components = 3 },
+    new { Name = "Vector4l", ComponentType = "long", Components = 4 },
+    new { Name = "Vector2b", ComponentType = "bool", Components = 2 },
+    new { Name = "Vector3b", ComponentType = "bool", Components = 3 },
+    new { Name = "Vector4b", ComponentType = "bool", Components = 4 },
+};
+var components = new []{"X","Y","Z","W"};
+#>
+            Default = new StreamConverterFactory();
+<#
+foreach (var type in types)
+{
+#>
+            Default.RegisterType<<#=type.Name#>>(new StreamMetaInfo(typeof(<#=type.ComponentType#>), typeof(<#=type.Name#>), <#=type.Components#>, 1))
+<#
+	foreach (var target in types.Where(_=>_!=type && _.Components != 1))
+	{
+	Func<string,string> convertValue = _=>_;
+	if (type.ComponentType != target.ComponentType)
+	{
+		if (type.ComponentType == "bool")
+			convertValue = _=>$"{_}?({target.ComponentType})1:default({target.ComponentType})";
+		else if (target.ComponentType == "bool")
+			convertValue = _=>_+"!=default("+type.ComponentType+")";
+		else 
+			convertValue = _=>$"({target.ComponentType}){_}";
+	}
+    Func<string,string> convertComponent;
+	convertComponent = (type.Components>1)
+		?((Func<string,string>)((c)=>convertValue($"value.{c}")))
+		:((Func<string,string>)((c)=>convertValue("value")));
+
+		var extraComponents = target.Components-type.Components;
+		if (extraComponents < 0) extraComponents = 0;
+		string args = string.Join(", ", components.Select(_=>convertComponent(_)).Take(Math.Min(target.Components,type.Components)).Concat(Enumerable.Range(0,extraComponents).Select(_=>"default("+target.ComponentType+")")));
+#>
+                .RegisterConverter(value => new <#=target.Name#>(<#=args#>))
+<#
+    }
+//                .RegisterConverter(c => EnumerateVector(c));
+#>
+                ;
+<#
+}
+#>
+
+        }
+    }
+}

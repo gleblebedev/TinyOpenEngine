@@ -6,14 +6,14 @@ using System.Runtime.CompilerServices;
 
 namespace Toe
 {
-	public partial struct Vector2d: IEquatable<Vector2d>, IEnumerable<double>, IEnumerable
-	{
-	
+    public partial struct Vector2d: IEquatable<Vector2d>, IEnumerable<double>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public double X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
@@ -73,7 +73,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -88,12 +88,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector2d is equal to this Vector2d instance.
         /// </summary>
         /// <param name="other">The Vector2d to compare this instance to.</param>
         /// <returns>True if the other Vector2d is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector2d other)
         {
             return 
@@ -102,7 +102,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -113,21 +113,21 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector3d: IEquatable<Vector3d>, IEnumerable<double>, IEnumerable
-	{
-	
+    public partial struct Vector3d: IEquatable<Vector3d>, IEnumerable<double>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public double X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public double Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
@@ -191,7 +191,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -207,12 +207,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector3d is equal to this Vector3d instance.
         /// </summary>
         /// <param name="other">The Vector3d to compare this instance to.</param>
         /// <returns>True if the other Vector3d is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector3d other)
         {
             return 
@@ -222,7 +222,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -234,26 +234,26 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector4d: IEquatable<Vector4d>, IEnumerable<double>, IEnumerable
-	{
-	
+    public partial struct Vector4d: IEquatable<Vector4d>, IEnumerable<double>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public double X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public double Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
         public double Z;
-	
+    
         /// <summary>
         /// The W component of the vector.
         /// </summary>
@@ -321,7 +321,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -338,12 +338,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector4d is equal to this Vector4d instance.
         /// </summary>
         /// <param name="other">The Vector4d to compare this instance to.</param>
         /// <returns>True if the other Vector4d is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector4d other)
         {
             return 
@@ -354,7 +354,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -367,16 +367,16 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector2i: IEquatable<Vector2i>, IEnumerable<int>, IEnumerable
-	{
-	
+    public partial struct Vector2i: IEquatable<Vector2i>, IEnumerable<int>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public int X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
@@ -436,7 +436,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -451,12 +451,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector2i is equal to this Vector2i instance.
         /// </summary>
         /// <param name="other">The Vector2i to compare this instance to.</param>
         /// <returns>True if the other Vector2i is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector2i other)
         {
             return 
@@ -465,7 +465,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -476,21 +476,21 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector3i: IEquatable<Vector3i>, IEnumerable<int>, IEnumerable
-	{
-	
+    public partial struct Vector3i: IEquatable<Vector3i>, IEnumerable<int>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public int X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public int Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
@@ -554,7 +554,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -570,12 +570,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector3i is equal to this Vector3i instance.
         /// </summary>
         /// <param name="other">The Vector3i to compare this instance to.</param>
         /// <returns>True if the other Vector3i is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector3i other)
         {
             return 
@@ -585,7 +585,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -597,26 +597,26 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector4i: IEquatable<Vector4i>, IEnumerable<int>, IEnumerable
-	{
-	
+    public partial struct Vector4i: IEquatable<Vector4i>, IEnumerable<int>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public int X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public int Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
         public int Z;
-	
+    
         /// <summary>
         /// The W component of the vector.
         /// </summary>
@@ -684,7 +684,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -701,12 +701,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector4i is equal to this Vector4i instance.
         /// </summary>
         /// <param name="other">The Vector4i to compare this instance to.</param>
         /// <returns>True if the other Vector4i is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector4i other)
         {
             return 
@@ -717,7 +717,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -730,26 +730,26 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector4us: IEquatable<Vector4us>, IEnumerable<ushort>, IEnumerable
-	{
-	
+    public partial struct Vector4us: IEquatable<Vector4us>, IEnumerable<ushort>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public ushort X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public ushort Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
         public ushort Z;
-	
+    
         /// <summary>
         /// The W component of the vector.
         /// </summary>
@@ -817,7 +817,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -834,12 +834,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector4us is equal to this Vector4us instance.
         /// </summary>
         /// <param name="other">The Vector4us to compare this instance to.</param>
         /// <returns>True if the other Vector4us is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector4us other)
         {
             return 
@@ -850,7 +850,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -863,26 +863,26 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector4ub: IEquatable<Vector4ub>, IEnumerable<byte>, IEnumerable
-	{
-	
+    public partial struct Vector4ub: IEquatable<Vector4ub>, IEnumerable<byte>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public byte X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public byte Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
         public byte Z;
-	
+    
         /// <summary>
         /// The W component of the vector.
         /// </summary>
@@ -950,7 +950,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -967,12 +967,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector4ub is equal to this Vector4ub instance.
         /// </summary>
         /// <param name="other">The Vector4ub to compare this instance to.</param>
         /// <returns>True if the other Vector4ub is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector4ub other)
         {
             return 
@@ -983,7 +983,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -996,16 +996,16 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector2l: IEquatable<Vector2l>, IEnumerable<long>, IEnumerable
-	{
-	
+    public partial struct Vector2l: IEquatable<Vector2l>, IEnumerable<long>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public long X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
@@ -1065,7 +1065,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -1080,12 +1080,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector2l is equal to this Vector2l instance.
         /// </summary>
         /// <param name="other">The Vector2l to compare this instance to.</param>
         /// <returns>True if the other Vector2l is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector2l other)
         {
             return 
@@ -1094,7 +1094,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -1105,21 +1105,21 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector3l: IEquatable<Vector3l>, IEnumerable<long>, IEnumerable
-	{
-	
+    public partial struct Vector3l: IEquatable<Vector3l>, IEnumerable<long>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public long X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public long Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
@@ -1183,7 +1183,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -1199,12 +1199,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector3l is equal to this Vector3l instance.
         /// </summary>
         /// <param name="other">The Vector3l to compare this instance to.</param>
         /// <returns>True if the other Vector3l is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector3l other)
         {
             return 
@@ -1214,7 +1214,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -1226,26 +1226,26 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector4l: IEquatable<Vector4l>, IEnumerable<long>, IEnumerable
-	{
-	
+    public partial struct Vector4l: IEquatable<Vector4l>, IEnumerable<long>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public long X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public long Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
         public long Z;
-	
+    
         /// <summary>
         /// The W component of the vector.
         /// </summary>
@@ -1313,7 +1313,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -1330,12 +1330,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector4l is equal to this Vector4l instance.
         /// </summary>
         /// <param name="other">The Vector4l to compare this instance to.</param>
         /// <returns>True if the other Vector4l is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector4l other)
         {
             return 
@@ -1346,7 +1346,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -1359,16 +1359,16 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector2b: IEquatable<Vector2b>, IEnumerable<bool>, IEnumerable
-	{
-	
+    public partial struct Vector2b: IEquatable<Vector2b>, IEnumerable<bool>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public bool X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
@@ -1423,7 +1423,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -1438,12 +1438,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector2b is equal to this Vector2b instance.
         /// </summary>
         /// <param name="other">The Vector2b to compare this instance to.</param>
         /// <returns>True if the other Vector2b is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector2b other)
         {
             return 
@@ -1452,7 +1452,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -1463,21 +1463,21 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector3b: IEquatable<Vector3b>, IEnumerable<bool>, IEnumerable
-	{
-	
+    public partial struct Vector3b: IEquatable<Vector3b>, IEnumerable<bool>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public bool X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public bool Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
@@ -1535,7 +1535,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -1551,12 +1551,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector3b is equal to this Vector3b instance.
         /// </summary>
         /// <param name="other">The Vector3b to compare this instance to.</param>
         /// <returns>True if the other Vector3b is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector3b other)
         {
             return 
@@ -1566,7 +1566,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -1578,26 +1578,26 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
-	public partial struct Vector4b: IEquatable<Vector4b>, IEnumerable<bool>, IEnumerable
-	{
-	
+    public partial struct Vector4b: IEquatable<Vector4b>, IEnumerable<bool>, IEnumerable
+    {
+    
         /// <summary>
         /// The X component of the vector.
         /// </summary>
         public bool X;
-	
+    
         /// <summary>
         /// The Y component of the vector.
         /// </summary>
         public bool Y;
-	
+    
         /// <summary>
         /// The Z component of the vector.
         /// </summary>
         public bool Z;
-	
+    
         /// <summary>
         /// The W component of the vector.
         /// </summary>
@@ -1658,7 +1658,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the two given vectors are not equal.
         /// </summary>
         /// <param name="left">The first vector to compare.</param>
@@ -1675,12 +1675,12 @@ namespace Toe
                 ;
         }
 
-		/// <summary>
+        /// <summary>
         /// Returns a boolean indicating whether the given Vector4b is equal to this Vector4b instance.
         /// </summary>
         /// <param name="other">The Vector4b to compare this instance to.</param>
         /// <returns>True if the other Vector4b is equal to this instance; False otherwise.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Vector4b other)
         {
             return 
@@ -1691,7 +1691,7 @@ namespace Toe
                 ;
         }
 
-		/// <summary>Returns the hash code for this instance.</summary>
+        /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         public override int GetHashCode()
         {
@@ -1704,6 +1704,6 @@ namespace Toe
                 return hashCode;
             }
         }
-	}
+    }
 
 }

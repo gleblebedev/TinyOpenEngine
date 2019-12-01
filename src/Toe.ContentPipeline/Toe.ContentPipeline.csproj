@@ -5,6 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="DefaultStreamConverter.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DefaultStreamConverter.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
   </ItemGroup>
@@ -12,6 +20,25 @@
   <ItemGroup>
     <ProjectReference Include="..\Toe.Math\Toe.Math.csproj" />
     <ProjectReference Include="..\Toe.SceneGraph\Toe.SceneGraph.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="DefaultStreamConverter.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DefaultStreamConverter.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="DefaultStreamConverter.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DefaultStreamConverter.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

@@ -20,9 +20,9 @@ namespace Toe.ContentPipeline
 
         public static readonly StreamKey TexCoord1 = new StreamKey(Streams.TexCoord, 1);
 
-        public static readonly StreamKey Weight = new StreamKey(Streams.Weight, 0);
+        public static readonly StreamKey Weights = new StreamKey(Streams.Weights, 0);
 
-        public static readonly StreamKey Joint = new StreamKey(Streams.Joint, 0);
+        public static readonly StreamKey Joints = new StreamKey(Streams.Joints, 0);
 
         public static readonly StreamKey Index = new StreamKey(Streams.Index, 0);
 

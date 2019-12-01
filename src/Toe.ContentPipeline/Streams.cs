@@ -19,9 +19,9 @@
 
         public const string TexCoord = "TEXCOORD";
 
-        public const string Weight = "WEIGHT";
+        public const string Weights = "WEIGHTS";
 
-        public const string Joint = "JOINT";
+        public const string Joints = "JOINTS";
 
         public const string Index = "INDEX";
 

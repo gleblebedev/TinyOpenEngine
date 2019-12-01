@@ -6,10 +6,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Vectors_Extensions.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Vectors_Extensions.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Vectors_Extensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Vectors_Extensions.cs</LastGenOutput>
+    </None>
     <None Update="Vectors_IFormattable.tt">
       <LastGenOutput>Vectors_IFormattable.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -29,6 +41,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Vectors.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Vectors_Extensions.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Vectors_Extensions.tt</DependentUpon>
     </Compile>
     <Compile Update="Vectors_IFormattable.cs">
       <DesignTime>True</DesignTime>

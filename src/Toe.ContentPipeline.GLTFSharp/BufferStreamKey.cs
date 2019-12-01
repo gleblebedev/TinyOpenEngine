@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using SharpGLTF.Schema2;
-using Toe.ContentPipeline;
 
 namespace Toe.ContentPipeline.GLTFSharp
 {
