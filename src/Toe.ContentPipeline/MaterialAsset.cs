@@ -10,10 +10,10 @@
         {
         }
 
-        public float AlphaCutoff { get; set; }
-        public AlphaMode Alpha { get; set; }
-        public bool DoubleSided { get; set; }
+        public float AlphaCutoff { get; set; } = 0.5f;
+        public AlphaMode Alpha { get; set; } = AlphaMode.Opaque;
+        public bool DoubleSided { get; set; } = false;
         public IShaderAsset Shader { get; set; }
-        public bool Unlit { get; set; }
+        public bool Unlit { get; set; } = false;
     }
 }

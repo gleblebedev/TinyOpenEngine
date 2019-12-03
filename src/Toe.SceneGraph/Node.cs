@@ -20,12 +20,13 @@ namespace Toe.SceneGraph
             _entity = entity;
             Transform = localTransform;
             Transform.OnUpdate += HandleTransformUpdate;
-            Transform.Reset();
 
             WorldTransform = worldTransform;
             WorldTransform.WorldMatrix = Matrix4x4.Identity;
 
             AddTo(this, scene);
+
+            InvalidateWorldTransform();
         }
 
         public LocalTransform Transform { get; }
