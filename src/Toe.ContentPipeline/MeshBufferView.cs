@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Toe.ContentPipeline
 {
-    public class MeshBufferView:IBufferView
+    public class MeshBufferView : IBufferView
     {
         protected readonly Dictionary<StreamKey, IMeshStream> _availableStreams =
             new Dictionary<StreamKey, IMeshStream>();

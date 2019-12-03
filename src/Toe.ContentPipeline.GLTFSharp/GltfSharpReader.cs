@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using SharpGLTF.Schema2;
+using Toe.SceneGraph;
 
 namespace Toe.ContentPipeline.GLTFSharp
 {
@@ -45,6 +47,9 @@ namespace Toe.ContentPipeline.GLTFSharp
 
             var meshAndSkin = context.ModelRoot.LogicalMeshes.Zip(skinsPerMesh, (m, s) => new {Mesh = m, Skin = s})
                 .ToList();
+            var textures = context.ModelRoot.LogicalTextures.ToLookup(_ => _.PrimaryImage);
+            context.Images = context.Container.Images.AddRange(context.ModelRoot.LogicalImages, _ => textures[_].Select(_1=>_1.Name).Concat(new []{_.Name}).FirstOrDefault(),
+                (m, id) => TransformImage(m, id, context));
             context.Cameras = context.Container.Cameras.AddRange(context.ModelRoot.LogicalCameras, _ => _.Name,
                 (m, id) => TransformCamera(m, id, context));
             context.Lights = context.Container.Lights.AddRange(context.ModelRoot.LogicalPunctualLights, _ => _.Name,
@@ -53,10 +58,8 @@ namespace Toe.ContentPipeline.GLTFSharp
                 (m, id) => TransformMaterial(m, id, context));
             context.Meshes = context.Container.Meshes.AddRange(meshAndSkin, _ => _.Mesh.Name,
                 (m, id) => TransformMesh(id, m.Mesh, m.Skin));
-
             context.Nodes = context.Container.Nodes.AddRange(context.ModelRoot.LogicalNodes, _ => _.Name,
                 (node, id) => TransformNode(node, id, context));
-
             context.Container.Scenes.AddRange(context.ModelRoot.LogicalScenes, _ => _.Name,
                 (s, id) => TransformScene(s, id, context));
 
@@ -67,6 +70,13 @@ namespace Toe.ContentPipeline.GLTFSharp
         {
             return new CameraAsset(id);
         }
+        private IImageAsset TransformImage(Image o, string id, ReaderContext context)
+        {
+            var transformImage = new EmbeddedImage(o.GetImageContent());
+            transformImage.Id = id;
+            transformImage.FileExtension = o.FileExtension;
+            return transformImage;
+        }
 
         private ILightAsset TransformLight(PunctualLight o, string id, ReaderContext context)
         {
@@ -75,7 +85,101 @@ namespace Toe.ContentPipeline.GLTFSharp
 
         private IMaterialAsset TransformMaterial(Material material, string id, ReaderContext context)
         {
-            return new MaterialAsset(id);
+            var materialAsset = new MaterialAsset(id);
+            materialAsset.AlphaCutoff = material.AlphaCutoff;
+            materialAsset.Alpha = GetAlphaMode(material.Alpha);
+            materialAsset.DoubleSided = material.DoubleSided;
+            materialAsset.Unlit = material.Unlit;
+
+            var shaderParameters = material.Channels.Select(_=>TransformShaderParameter(_, context)).ToDictionary(_ => _.Key, _ => _);
+            int metallicRoughness = 0;
+            int specularGlossiness = 0;
+            int unknown = 0;
+            foreach (var shaderParameter in shaderParameters)
+            {
+                switch (shaderParameter.Key)
+                {
+                    case ShaderParameterKey.BaseColor:
+                    case ShaderParameterKey.MetallicRoughness:
+                        ++metallicRoughness;
+                        break;
+                    case ShaderParameterKey.Diffuse:
+                    case ShaderParameterKey.SpecularGlossiness:
+                        ++specularGlossiness;
+                        break;
+                    case ShaderParameterKey.Normal:
+                    case ShaderParameterKey.Occlusion:
+                    case ShaderParameterKey.Emissive:
+                        break;
+                    default:
+                        ++unknown;
+                        break;
+                }
+            }
+
+            if (metallicRoughness > 0 && specularGlossiness == 0)
+            {
+                var shader = new MetallicRoughnessShader();
+                materialAsset.Shader = shader;
+            }
+            else
+            if (metallicRoughness == 0 && specularGlossiness >= 0)
+            {
+                var shader = new SpecularGlossinessShader();
+                materialAsset.Shader = shader;
+            }
+            else
+            {
+                var shader = new ShaderAsset();
+                materialAsset.Shader = shader;
+            }
+
+            foreach (var shaderParameter in shaderParameters)
+            {
+                materialAsset.Shader.Set(shaderParameter.Value);
+            }
+
+            return materialAsset;
+        }
+
+        private IShaderParameter TransformShaderParameter(MaterialChannel materialChannel, ReaderContext context)
+        {
+            var shaderParameter = new ShaderParameter(materialChannel.Key);
+            shaderParameter.Value = materialChannel.Parameter;
+            var texture = materialChannel.Texture;
+            if (texture != null)
+            {
+                var primaryImage = texture.PrimaryImage;
+                if (primaryImage != null)
+                {
+                    shaderParameter.Image = context.Images[primaryImage.LogicalIndex];
+                    shaderParameter.TextureCoordinate = materialChannel.TextureCoordinate;
+                    shaderParameter.TextureTransform = TransformTextureTransform(materialChannel.TextureTransform);
+                }
+            }
+            return shaderParameter;
+        }
+
+        private LocalTransform TransformTextureTransform(TextureTransform textureTransform)
+        {
+            if (textureTransform == null)
+                return null;
+            return null;
+        }
+
+        private AlphaMode GetAlphaMode(SharpGLTF.Schema2.AlphaMode materialAlpha)
+        {
+            switch (materialAlpha)
+            {
+                case SharpGLTF.Schema2.AlphaMode.OPAQUE:
+                    return AlphaMode.Opaque;
+                case SharpGLTF.Schema2.AlphaMode.MASK:
+                    return AlphaMode.Mask;
+                case SharpGLTF.Schema2.AlphaMode.BLEND:
+                    return AlphaMode.Blend;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(materialAlpha), materialAlpha, null);
+            }
         }
 
         private IContentContainer ReadStream(Stream stream)

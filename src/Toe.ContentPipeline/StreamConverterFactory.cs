@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace Toe.ContentPipeline
 {
@@ -12,11 +11,13 @@ namespace Toe.ContentPipeline
         {
             yield return x;
         }
+
         private static IEnumerable<T> EnumerateVector<T>(T x, T y)
         {
             yield return x;
             yield return y;
         }
+
         private static IEnumerable<T> EnumerateVector<T>(T x, T y, T z)
         {
             yield return x;

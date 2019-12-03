@@ -15,6 +15,7 @@ namespace Toe.ContentPipeline
                 return await reader.ReadAsync(stream);
             }
         }
+
         public static async Task SaveAsync(this IFileWriter writer, string fileName, IContentContainer container)
         {
             using (var stream = File.Open(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))

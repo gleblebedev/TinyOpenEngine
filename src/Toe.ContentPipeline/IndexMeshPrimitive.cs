@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Toe.ContentPipeline
+﻿namespace Toe.ContentPipeline
 {
     public class IndexMeshPrimitive : AbstractPrimitive, IMeshPrimitive
     {

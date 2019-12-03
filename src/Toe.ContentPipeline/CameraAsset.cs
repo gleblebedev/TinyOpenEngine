@@ -5,7 +5,8 @@
         public CameraAsset(string id) : base(id)
         {
         }
-        public CameraAsset() : base()
+
+        public CameraAsset()
         {
         }
     }

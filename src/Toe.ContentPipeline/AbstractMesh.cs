@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Toe.ContentPipeline
 {
-    public abstract class AbstractMesh<P> : AbstractAsset where P:IMeshPrimitive
+    public abstract class AbstractMesh<P> : AbstractAsset where P : IMeshPrimitive
     {
         protected readonly IList<IMeshPrimitive> _abstractPrimitives;
         protected readonly List<P> _primitives;
@@ -21,23 +21,14 @@ namespace Toe.ContentPipeline
 
         public IEnumerable<IBufferView> BufferViews
         {
-            get
-            {
-                return _primitives.Select(_ => _.BufferView).Distinct();
-            }
+            get { return _primitives.Select(_ => _.BufferView).Distinct(); }
         }
 
         public bool DeleteStream(StreamKey key)
         {
             var res = false;
-            foreach (var primitive in _primitives)
-            {
-                res |= primitive.DeleteStream(key);
-            }
-            foreach (var primitive in _primitives)
-            {
-                res |= primitive.BufferView.DeleteStream(key);
-            }
+            foreach (var primitive in _primitives) res |= primitive.DeleteStream(key);
+            foreach (var primitive in _primitives) res |= primitive.BufferView.DeleteStream(key);
 
             return res;
         }

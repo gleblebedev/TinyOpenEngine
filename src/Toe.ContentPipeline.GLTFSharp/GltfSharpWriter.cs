@@ -19,16 +19,94 @@ namespace Toe.ContentPipeline.GLTFSharp
                     Container = content,
                     ModelRoot = ModelRoot.CreateModel()
                 };
-                foreach (var textureAsset in content.Textures)
+                foreach (var textureAsset in content.Images)
                 {
                     var image = context.ModelRoot.CreateImage(textureAsset.Id);
-                    image.SetSatelliteContent(await textureAsset.GetContentAsync());
+                    image.SetSatelliteContent((await textureAsset.GetContentAsync()).ToArray());
                     context.Textures.Add(textureAsset, image);
                 }
 
                 foreach (var materialAsset in content.Materials)
                 {
                     var material = context.ModelRoot.CreateMaterial(materialAsset.Id);
+                    material.AlphaCutoff = materialAsset.AlphaCutoff;
+                    material.Alpha = GetAlphaMode(materialAsset.Alpha);
+                    material.DoubleSided = materialAsset.DoubleSided;
+                    if (materialAsset.Unlit)
+                    {
+                        material = material.WithUnlit();
+                    }
+
+                    var metallicRoughnessShader = materialAsset.Shader as MetallicRoughnessShader;
+                    if (metallicRoughnessShader != null)
+                    {
+                        material = material.WithPBRMetallicRoughness();
+                    }
+                    else
+                    {
+                        var specularGlossinessShader = materialAsset.Shader as SpecularGlossinessShader;
+                        if (specularGlossinessShader != null)
+                        {
+                            material = material.WithPBRSpecularGlossiness();
+                        }
+                        else
+                        {
+                            material.WithDefault();
+                        }
+                    }
+
+                    if (materialAsset.Shader != null)
+                    {
+                        foreach (var parameter in materialAsset.Shader.Parameters)
+                        {
+                            var parameterKey = parameter.Key;
+                            var materialChannel = material.FindChannel(parameterKey);
+                            if (materialChannel != null)
+                            {
+                                if (parameter.Image != null)
+                                {
+                                    var contextTexture = context.Textures[parameter.Image];
+                                    material = material.WithChannelTexture(parameterKey, parameter.TextureCoordinate, contextTexture);
+                                }
+
+                                switch (parameter.Key)
+                                {
+                                    case ShaderParameterKey.Emissive:
+                                        if (parameter.Value != ShaderAsset.DefaultEmissive.Value)
+                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
+                                        break;
+                                    case ShaderParameterKey.BaseColor:
+                                        if (parameter.Value != ShaderAsset.DefaultBaseColor.Value)
+                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
+                                        break;
+                                    case ShaderParameterKey.MetallicRoughness:
+                                        if (parameter.Value != ShaderAsset.DefaultMetallicRoughness.Value)
+                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
+                                        break;
+                                    case ShaderParameterKey.Diffuse:
+                                        if (parameter.Value != ShaderAsset.DefaultDiffuse.Value)
+                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
+                                        break;
+                                    case ShaderParameterKey.Normal:
+                                        if (parameter.Value != ShaderAsset.DefaultNormal.Value)
+                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
+                                        break;
+                                    case ShaderParameterKey.SpecularGlossiness:
+                                        if (parameter.Value != ShaderAsset.DefaultSpecularGlossiness.Value)
+                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
+                                        break;
+                                    case ShaderParameterKey.Occlusion:
+                                        if (parameter.Value != ShaderAsset.DefaultOcclusion.Value)
+                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
+                                        break;
+                                    default:
+                                        material = material.WithChannelParameter(parameterKey, parameter.Value);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+
                     context.Materials.Add(materialAsset, material);
                 }
 
@@ -62,6 +140,21 @@ namespace Toe.ContentPipeline.GLTFSharp
 
                 context.ModelRoot.WriteGLB(stream);
             });
+        }
+
+        private SharpGLTF.Schema2.AlphaMode GetAlphaMode(AlphaMode materialAssetAlpha)
+        {
+            switch (materialAssetAlpha)
+            {
+                case AlphaMode.Opaque:
+                    return SharpGLTF.Schema2.AlphaMode.OPAQUE;
+                case AlphaMode.Mask:
+                    return SharpGLTF.Schema2.AlphaMode.MASK;
+                case AlphaMode.Blend:
+                    return SharpGLTF.Schema2.AlphaMode.BLEND;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(materialAssetAlpha), materialAssetAlpha, null);
+            }
         }
 
         private IEnumerable<INodeAsset> GetAllNodes(IContentContainer content)

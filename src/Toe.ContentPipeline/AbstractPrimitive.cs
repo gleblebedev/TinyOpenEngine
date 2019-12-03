@@ -2,12 +2,12 @@
 {
     public abstract class AbstractPrimitive
     {
-        public PrimitiveTopology Topology { get; set; } = PrimitiveTopology.TriangleList;
-
         public AbstractPrimitive(IBufferView bufferView)
         {
             BufferView = bufferView;
         }
+
+        public PrimitiveTopology Topology { get; set; } = PrimitiveTopology.TriangleList;
 
         public IBufferView BufferView { get; }
 
@@ -15,6 +15,5 @@
         {
             return false;
         }
-
     }
 }

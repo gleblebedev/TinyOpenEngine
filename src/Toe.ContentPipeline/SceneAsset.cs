@@ -14,16 +14,6 @@ namespace Toe.ContentPipeline
             ChildNodes = new NodeContainerAdapter<INodeAsset>(_sceneGraph);
         }
 
-        public void Add(NodeAsset node)
-        {
-            if (node.GraphNode != null)
-            {
-                if (node.GraphNode.Scene == _sceneGraph)
-                    return;
-                throw new InvalidOperationException($"Node {node.Id} is already attached to a scene.");
-            }
-            node.GraphNode = _sceneGraph.CreateNode(null, node, node.Transform);
-        }
         public bool HasChildren
         {
             get
@@ -33,6 +23,19 @@ namespace Toe.ContentPipeline
                 return _sceneGraph.HasChildren;
             }
         }
+
         public IReadOnlyCollection<INodeAsset> ChildNodes { get; }
+
+        public void Add(NodeAsset node)
+        {
+            if (node.GraphNode != null)
+            {
+                if (node.GraphNode.Scene == _sceneGraph)
+                    return;
+                throw new InvalidOperationException($"Node {node.Id} is already attached to a scene.");
+            }
+
+            node.GraphNode = _sceneGraph.CreateNode(null, node, node.Transform);
+        }
     }
 }

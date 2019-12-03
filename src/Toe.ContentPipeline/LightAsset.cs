@@ -5,7 +5,8 @@
         public LightAsset(string id) : base(id)
         {
         }
-        public LightAsset() : base()
+
+        public LightAsset()
         {
         }
     }

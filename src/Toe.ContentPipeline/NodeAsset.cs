@@ -15,20 +15,19 @@ namespace Toe.ContentPipeline
 
         public Node<INodeAsset> GraphNode
         {
-            get { return _graphNode; }
+            get => _graphNode;
             internal set
             {
                 _graphNode = value;
                 if (_graphNode != null)
-                {
                     ChildNodes = new NodeContainerAdapter<INodeAsset>(_graphNode);
-                }
                 else
-                {
                     ChildNodes = null;
-                }
             }
         }
+
+        public ICameraAsset Camera { get; set; }
+        public ICameraAsset Light { get; set; }
 
         public IReadOnlyCollection<INodeAsset> ChildNodes { get; private set; }
 
@@ -76,8 +75,5 @@ namespace Toe.ContentPipeline
                 return GraphNode.HasChildren;
             }
         }
-
-        public ICameraAsset Camera { get; set; }
-        public ICameraAsset Light { get; set; }
     }
 }

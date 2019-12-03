@@ -7,7 +7,7 @@ namespace Toe.ContentPipeline.GLTFSharp
     {
         public IContentContainer Container { get; set; }
         public ModelRoot ModelRoot { get; set; }
-        public Dictionary<ITextureAsset, Image> Textures { get; } = new Dictionary<ITextureAsset, Image>();
+        public Dictionary<IImageAsset, Image> Textures { get; } = new Dictionary<IImageAsset, Image>();
         public Dictionary<IMaterialAsset, Material> Materials { get; } = new Dictionary<IMaterialAsset, Material>();
         public Dictionary<IMesh, Mesh> Meshes { get; } = new Dictionary<IMesh, Mesh>();
 
