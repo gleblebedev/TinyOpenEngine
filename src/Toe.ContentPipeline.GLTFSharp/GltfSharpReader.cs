@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +47,8 @@ namespace Toe.ContentPipeline.GLTFSharp
             var meshAndSkin = context.ModelRoot.LogicalMeshes.Zip(skinsPerMesh, (m, s) => new {Mesh = m, Skin = s})
                 .ToList();
             var textures = context.ModelRoot.LogicalTextures.ToLookup(_ => _.PrimaryImage);
-            context.Images = context.Container.Images.AddRange(context.ModelRoot.LogicalImages, _ => textures[_].Select(_1=>_1.Name).Concat(new []{_.Name}).FirstOrDefault(),
+            context.Images = context.Container.Images.AddRange(context.ModelRoot.LogicalImages,
+                _ => textures[_].Select(_1 => _1.Name).Concat(new[] {_.Name}).FirstOrDefault(),
                 (m, id) => TransformImage(m, id, context));
             context.Cameras = context.Container.Cameras.AddRange(context.ModelRoot.LogicalCameras, _ => _.Name,
                 (m, id) => TransformCamera(m, id, context));
@@ -70,6 +70,7 @@ namespace Toe.ContentPipeline.GLTFSharp
         {
             return new CameraAsset(id);
         }
+
         private IImageAsset TransformImage(Image o, string id, ReaderContext context)
         {
             var transformImage = new EmbeddedImage(o.GetImageContent());
@@ -91,12 +92,12 @@ namespace Toe.ContentPipeline.GLTFSharp
             materialAsset.DoubleSided = material.DoubleSided;
             materialAsset.Unlit = material.Unlit;
 
-            var shaderParameters = material.Channels.Select(_=>TransformShaderParameter(_, context)).ToDictionary(_ => _.Key, _ => _);
-            int metallicRoughness = 0;
-            int specularGlossiness = 0;
-            int unknown = 0;
+            var shaderParameters = material.Channels.Select(_ => TransformShaderParameter(_, context))
+                .ToDictionary(_ => _.Key, _ => _);
+            var metallicRoughness = 0;
+            var specularGlossiness = 0;
+            var unknown = 0;
             foreach (var shaderParameter in shaderParameters)
-            {
                 switch (shaderParameter.Key)
                 {
                     case ShaderParameterKey.BaseColor:
@@ -115,15 +116,13 @@ namespace Toe.ContentPipeline.GLTFSharp
                         ++unknown;
                         break;
                 }
-            }
 
             if (metallicRoughness > 0 && specularGlossiness == 0)
             {
                 var shader = new MetallicRoughnessShader();
                 materialAsset.Shader = shader;
             }
-            else
-            if (metallicRoughness == 0 && specularGlossiness >= 0)
+            else if (metallicRoughness == 0 && specularGlossiness >= 0)
             {
                 var shader = new SpecularGlossinessShader();
                 materialAsset.Shader = shader;
@@ -134,10 +133,7 @@ namespace Toe.ContentPipeline.GLTFSharp
                 materialAsset.Shader = shader;
             }
 
-            foreach (var shaderParameter in shaderParameters)
-            {
-                materialAsset.Shader.Set(shaderParameter.Value);
-            }
+            foreach (var shaderParameter in shaderParameters) materialAsset.Shader.Set(shaderParameter.Value);
 
             return materialAsset;
         }
@@ -157,6 +153,7 @@ namespace Toe.ContentPipeline.GLTFSharp
                     shaderParameter.TextureTransform = TransformTextureTransform(materialChannel.TextureTransform);
                 }
             }
+
             return shaderParameter;
         }
 
@@ -324,7 +321,7 @@ namespace Toe.ContentPipeline.GLTFSharp
             nodeAsset.Transform.Matrix = node.LocalMatrix;
             if (node.Mesh != null)
                 nodeAsset.Mesh = new MeshInstance(context.Meshes[node.Mesh.LogicalIndex],
-                    node.Mesh.Primitives.Select(_ => context.Materials[_.LogicalIndex]).ToList());
+                    node.Mesh.Primitives.Select(_ => context.Materials[_.Material.LogicalIndex]).ToList());
             if (node.Camera != null) nodeAsset.Camera = context.Cameras[node.Camera.LogicalIndex];
             if (node.PunctualLight != null) nodeAsset.Light = context.Cameras[node.PunctualLight.LogicalIndex];
             return nodeAsset;

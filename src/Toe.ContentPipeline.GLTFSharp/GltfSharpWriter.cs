@@ -32,10 +32,7 @@ namespace Toe.ContentPipeline.GLTFSharp
                     material.AlphaCutoff = materialAsset.AlphaCutoff;
                     material.Alpha = GetAlphaMode(materialAsset.Alpha);
                     material.DoubleSided = materialAsset.DoubleSided;
-                    if (materialAsset.Unlit)
-                    {
-                        material = material.WithUnlit();
-                    }
+                    if (materialAsset.Unlit) material = material.WithUnlit();
 
                     var metallicRoughnessShader = materialAsset.Shader as MetallicRoughnessShader;
                     if (metallicRoughnessShader != null)
@@ -46,17 +43,12 @@ namespace Toe.ContentPipeline.GLTFSharp
                     {
                         var specularGlossinessShader = materialAsset.Shader as SpecularGlossinessShader;
                         if (specularGlossinessShader != null)
-                        {
                             material = material.WithPBRSpecularGlossiness();
-                        }
                         else
-                        {
                             material.WithDefault();
-                        }
                     }
 
                     if (materialAsset.Shader != null)
-                    {
                         foreach (var parameter in materialAsset.Shader.Parameters)
                         {
                             var parameterKey = parameter.Key;
@@ -66,7 +58,8 @@ namespace Toe.ContentPipeline.GLTFSharp
                                 if (parameter.Image != null)
                                 {
                                     var contextTexture = context.Textures[parameter.Image];
-                                    material = material.WithChannelTexture(parameterKey, parameter.TextureCoordinate, contextTexture);
+                                    material = material.WithChannelTexture(parameterKey, parameter.TextureCoordinate,
+                                        contextTexture);
                                 }
 
                                 switch (parameter.Key)
@@ -88,7 +81,7 @@ namespace Toe.ContentPipeline.GLTFSharp
                                             material = material.WithChannelParameter(parameterKey, parameter.Value);
                                         break;
                                     case ShaderParameterKey.Normal:
-                                        if (parameter.Value != ShaderAsset.DefaultNormal.Value)
+                                        if (parameter.Value != ShaderAsset.DefaultNormal.Value && parameter.Image != null)
                                             material = material.WithChannelParameter(parameterKey, parameter.Value);
                                         break;
                                     case ShaderParameterKey.SpecularGlossiness:
@@ -96,7 +89,7 @@ namespace Toe.ContentPipeline.GLTFSharp
                                             material = material.WithChannelParameter(parameterKey, parameter.Value);
                                         break;
                                     case ShaderParameterKey.Occlusion:
-                                        if (parameter.Value != ShaderAsset.DefaultOcclusion.Value)
+                                        if (parameter.Value != ShaderAsset.DefaultOcclusion.Value && parameter.Image != null)
                                             material = material.WithChannelParameter(parameterKey, parameter.Value);
                                         break;
                                     default:
@@ -105,7 +98,6 @@ namespace Toe.ContentPipeline.GLTFSharp
                                 }
                             }
                         }
-                    }
 
                     context.Materials.Add(materialAsset, material);
                 }
@@ -371,14 +363,14 @@ namespace Toe.ContentPipeline.GLTFSharp
 
         private void TransformNode(WriterContext context, INodeAsset nodeAsset, Node node)
         {
-            node.LocalTransform = nodeAsset.Transform.Matrix;
+            node.LocalMatrix = nodeAsset.Transform.Matrix;
 
             if (nodeAsset.Mesh != null)
             {
                 Mesh mesh;
                 if (!context.Meshes.TryGetValue(nodeAsset.Mesh.Mesh, out mesh))
                     mesh = TransformMesh(context, nodeAsset.Mesh.Mesh, nodeAsset.Mesh.Materials);
-                node.Mesh = context.Meshes[nodeAsset.Mesh.Mesh];
+                node.Mesh = mesh;
             }
 
             foreach (var childNode in nodeAsset.ChildNodes)
