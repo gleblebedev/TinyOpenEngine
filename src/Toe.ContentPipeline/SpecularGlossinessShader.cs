@@ -16,10 +16,13 @@ namespace Toe.ContentPipeline
             get
             {
                 yield return DiffuseFactor.AsShaderParameter(ShaderParameterKey.DiffuseFactor);
-                if (DiffuseTexture.Image != null) yield return DiffuseTexture.AsShaderParameter(ShaderParameterKey.DiffuseTexture);
+                if (DiffuseTexture.Image != null)
+                    yield return DiffuseTexture.AsShaderParameter(ShaderParameterKey.DiffuseTexture);
                 yield return SpecularFactor.AsShaderParameter(ShaderParameterKey.SpecularFactor);
                 yield return GlossinessFactor.AsShaderParameter(ShaderParameterKey.GlossinessFactor);
-                if (SpecularGlossinessTexture.Image != null) yield return SpecularGlossinessTexture.AsShaderParameter(ShaderParameterKey.SpecularGlossinessTexture);
+                if (SpecularGlossinessTexture.Image != null)
+                    yield return SpecularGlossinessTexture.AsShaderParameter(ShaderParameterKey
+                        .SpecularGlossinessTexture);
                 foreach (var shaderParameter in base.Parameters) yield return shaderParameter;
             }
         }

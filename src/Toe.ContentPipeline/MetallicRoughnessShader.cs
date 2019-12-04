@@ -17,10 +17,13 @@ namespace Toe.ContentPipeline
             get
             {
                 yield return BaseColorFactor.AsShaderParameter(ShaderParameterKey.BaseColorFactor);
-                if (BaseColorTexture.Image != null) yield return BaseColorTexture.AsShaderParameter(ShaderParameterKey.BaseColorTexture);
+                if (BaseColorTexture.Image != null)
+                    yield return BaseColorTexture.AsShaderParameter(ShaderParameterKey.BaseColorTexture);
                 yield return MetallicFactor.AsShaderParameter(ShaderParameterKey.MetallicFactor);
                 yield return RoughnessFactor.AsShaderParameter(ShaderParameterKey.RoughnessFactor);
-                if (MetallicRoughnessTexture.Image != null) yield return MetallicRoughnessTexture.AsShaderParameter(ShaderParameterKey.MetallicRoughnessTexture);
+                if (MetallicRoughnessTexture.Image != null)
+                    yield return
+                        MetallicRoughnessTexture.AsShaderParameter(ShaderParameterKey.MetallicRoughnessTexture);
                 foreach (var shaderParameter in base.Parameters) yield return shaderParameter;
             }
         }

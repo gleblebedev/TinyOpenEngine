@@ -8,10 +8,11 @@ namespace Toe.ContentPipeline
 {
     public static class ExtensionMethods
     {
-        public static IShaderParameter<T> AsShaderParameter<T>(this T value, string key) where T: struct
+        public static IShaderParameter<T> AsShaderParameter<T>(this T value, string key) where T : struct
         {
             return new ShaderParameter<T>(key, value);
         }
+
         public static async Task<IContentContainer> LoadAsync(this IStreamReader reader, string fileName)
         {
             using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
