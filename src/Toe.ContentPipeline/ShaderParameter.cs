@@ -1,9 +1,8 @@
-﻿using System.Numerics;
-using Toe.SceneGraph;
+﻿using System;
 
 namespace Toe.ContentPipeline
 {
-    public class ShaderParameter : IShaderParameter
+    public abstract class ShaderParameter : IShaderParameter
     {
         public ShaderParameter(string key)
         {
@@ -11,14 +10,38 @@ namespace Toe.ContentPipeline
         }
 
         public string Key { get; }
-        public Vector4 Value { get; set; }
-        public IImageAsset Image { get; set; }
-        public LocalTransform TextureTransform { get; set; }
-        public int TextureCoordinate { get; set; }
+
+        public abstract Type ValueType { get; }
 
         public override string ToString()
         {
-            return Key + ":" + (Image != null ? Image.ToString() : Value.ToString());
+            return $"{ValueType.Name} {Key}";
+        }
+
+        public static ShaderParameter<T> Create<T>(string key, T value)
+        {
+            return new ShaderParameter<T>(key, value);
+        }
+    }
+
+    public class ShaderParameter<T> : ShaderParameter, IShaderParameter<T>
+    {
+        public ShaderParameter(string key) : base(key)
+        {
+        }
+
+        public ShaderParameter(string key, T value) : base(key)
+        {
+            Value = value;
+        }
+
+        public override Type ValueType => typeof(T);
+
+        public T Value { get; set; }
+
+        public override string ToString()
+        {
+            return $"{ValueType.Name} {Key} = {Value}";
         }
     }
 }

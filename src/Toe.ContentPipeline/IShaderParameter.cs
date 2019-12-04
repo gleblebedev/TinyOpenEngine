@@ -1,14 +1,16 @@
-﻿using System.Numerics;
-using Toe.SceneGraph;
+﻿using System;
 
 namespace Toe.ContentPipeline
 {
+    public interface IShaderParameter<T> : IShaderParameter
+    {
+        T Value { get; }
+    }
+
     public interface IShaderParameter
     {
         string Key { get; }
-        Vector4 Value { get; }
-        IImageAsset Image { get; }
-        LocalTransform TextureTransform { get; }
-        int TextureCoordinate { get; }
+
+        Type ValueType { get; }
     }
 }

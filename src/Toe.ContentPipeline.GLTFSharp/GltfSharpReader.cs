@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using SharpGLTF.Schema2;
 using Toe.SceneGraph;
@@ -92,28 +93,25 @@ namespace Toe.ContentPipeline.GLTFSharp
             materialAsset.DoubleSided = material.DoubleSided;
             materialAsset.Unlit = material.Unlit;
 
-            var shaderParameters = material.Channels.Select(_ => TransformShaderParameter(_, context))
+            var shaderParameters = material.Channels.Select(_ => TransformShaderParameter(_, context)).SelectMany(_=>_)
                 .ToDictionary(_ => _.Key, _ => _);
             var metallicRoughness = 0;
             var specularGlossiness = 0;
-            var unknown = 0;
             foreach (var shaderParameter in shaderParameters)
                 switch (shaderParameter.Key)
                 {
-                    case ShaderParameterKey.BaseColor:
-                    case ShaderParameterKey.MetallicRoughness:
+                    case ShaderParameterKey.BaseColorFactor:
+                    case ShaderParameterKey.BaseColorTexture:
+                    case ShaderParameterKey.MetallicFactor:
+                    case ShaderParameterKey.MetallicRoughnessTexture:
                         ++metallicRoughness;
                         break;
-                    case ShaderParameterKey.Diffuse:
-                    case ShaderParameterKey.SpecularGlossiness:
+                    case ShaderParameterKey.DiffuseFactor:
+                    case ShaderParameterKey.DiffuseTexture:
+                    case ShaderParameterKey.SpecularFactor:
+                    case ShaderParameterKey.GlossinessFactor:
+                    case ShaderParameterKey.SpecularGlossinessTexture:
                         ++specularGlossiness;
-                        break;
-                    case ShaderParameterKey.Normal:
-                    case ShaderParameterKey.Occlusion:
-                    case ShaderParameterKey.Emissive:
-                        break;
-                    default:
-                        ++unknown;
                         break;
                 }
 
@@ -138,23 +136,106 @@ namespace Toe.ContentPipeline.GLTFSharp
             return materialAsset;
         }
 
-        private IShaderParameter TransformShaderParameter(MaterialChannel materialChannel, ReaderContext context)
+        private IEnumerable<IShaderParameter> TransformShaderParameter(MaterialChannel materialChannel, ReaderContext context)
         {
-            var shaderParameter = new ShaderParameter(materialChannel.Key);
-            shaderParameter.Value = materialChannel.Parameter;
-            var texture = materialChannel.Texture;
-            if (texture != null)
+            var parameter = materialChannel.Parameter;
+            switch (materialChannel.Key)
             {
-                var primaryImage = texture.PrimaryImage;
-                if (primaryImage != null)
+                case "BaseColor":
                 {
-                    shaderParameter.Image = context.Images[primaryImage.LogicalIndex];
-                    shaderParameter.TextureCoordinate = materialChannel.TextureCoordinate;
-                    shaderParameter.TextureTransform = TransformTextureTransform(materialChannel.TextureTransform);
+                    var samplerParameters = TransfromSamplerParameters(materialChannel, context);
+                    if (samplerParameters.HasValue)
+                    {
+                        yield return new ShaderParameter<SamplerParameters>(ShaderParameterKey.BaseColorTexture, samplerParameters.Value);
+                    }
                 }
-            }
+                    yield return new ShaderParameter<Vector4>(ShaderParameterKey.BaseColorFactor, parameter);
+                    yield break;
+                case "Diffuse":
+                {
+                    var samplerParameters = TransfromSamplerParameters(materialChannel, context);
+                    if (samplerParameters.HasValue)
+                    {
+                        yield return new ShaderParameter<SamplerParameters>(ShaderParameterKey.DiffuseTexture, samplerParameters.Value);
+                    }
+                }
+                    yield return new ShaderParameter<Vector4>(ShaderParameterKey.DiffuseFactor, parameter);
+                    yield break;
+                case "MetallicRoughness":
+                {
+                    var samplerParameters = TransfromSamplerParameters(materialChannel, context);
+                    if (samplerParameters.HasValue)
+                    {
+                        yield return new ShaderParameter<SamplerParameters>(ShaderParameterKey.MetallicRoughnessTexture, samplerParameters.Value);
+                    }
+                }
+                    yield return new ShaderParameter<float>(ShaderParameterKey.MetallicFactor, parameter.X);
+                    yield return new ShaderParameter<float>(ShaderParameterKey.RoughnessFactor, parameter.Y);
+                    yield break;
+                case "SpecularGlossiness":
+                {
+                    var samplerParameters = TransfromSamplerParameters(materialChannel, context);
+                    if (samplerParameters.HasValue)
+                    {
+                        yield return new ShaderParameter<SamplerParameters>(ShaderParameterKey.SpecularGlossinessTexture, samplerParameters.Value);
+                    }
+                }
+                    yield return new ShaderParameter<Vector3>(ShaderParameterKey.SpecularFactor, new Vector3(parameter.X, parameter.Y, parameter.Z));
+                    yield return new ShaderParameter<float>(ShaderParameterKey.GlossinessFactor, parameter.W);
+                    yield break;
+                case "Normal":
+                {
+                    var samplerParameters = TransfromSamplerParameters(materialChannel, context);
+                    if (samplerParameters.HasValue)
+                    {
+                        yield return new ShaderParameter<SamplerParameters>(ShaderParameterKey.NormalTexture, samplerParameters.Value);
+                    }
+                }
+                    yield return new ShaderParameter<float>(ShaderParameterKey.NormalTextureScale, parameter.X);
+                    yield break;
+                case "Occlusion":
+                {
+                    var samplerParameters = TransfromSamplerParameters(materialChannel, context);
+                    if (samplerParameters.HasValue)
+                    {
+                        yield return new ShaderParameter<SamplerParameters>(ShaderParameterKey.OcclusionTexture, samplerParameters.Value);
+                    }
+                }
+                    yield return new ShaderParameter<float>(ShaderParameterKey.OcclusionTextureStrength, parameter.X);
+                    yield break;
+                case "Emissive":
+                {
+                    var samplerParameters = TransfromSamplerParameters(materialChannel, context);
+                    if (samplerParameters.HasValue)
+                    {
+                        yield return new ShaderParameter<SamplerParameters>(ShaderParameterKey.EmissiveTexture,
+                            samplerParameters.Value);
+                    }
+                }
+                {
+                    yield return new ShaderParameter<Vector3>(ShaderParameterKey.EmissiveFactor, new Vector3(parameter.X, parameter.Y, parameter.Z));
+                }
+                    yield break;
 
-            return shaderParameter;
+                default:
+                    throw new NotImplementedException($"Material channel {materialChannel.Key} is not supported yet");
+            }
+        }
+
+        private SamplerParameters? TransfromSamplerParameters(MaterialChannel materialChannel, ReaderContext context)
+        {
+            var materialChannelTexture = materialChannel.Texture;
+            if (materialChannelTexture == null)
+                return null;
+            var primaryImage = materialChannelTexture.PrimaryImage;
+            if (primaryImage == null)
+                return null;
+            return new SamplerParameters
+            {
+                Image = context.Images[primaryImage.LogicalIndex],
+                TextureCoordinate = materialChannel.TextureCoordinate,
+                TextureTransform = TransformTextureTransform(materialChannel.TextureTransform)
+            };
         }
 
         private LocalTransform TransformTextureTransform(TextureTransform textureTransform)

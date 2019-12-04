@@ -11,7 +11,7 @@ namespace Toe.ContentPipeline.FBXSharp
             return Task.Run(() =>
             {
                 var contentContainer = new ContentContainer();
-                FbxIO.Read(stream, ErrorLevel.Permissive);
+                var fbxDocument = FbxIO.Read(stream, ErrorLevel.Permissive);
                 return (IContentContainer)contentContainer;
             });
         }

@@ -37,67 +37,21 @@ namespace Toe.ContentPipeline.GLTFSharp
                     var metallicRoughnessShader = materialAsset.Shader as MetallicRoughnessShader;
                     if (metallicRoughnessShader != null)
                     {
-                        material = material.WithPBRMetallicRoughness();
+                        SetupMetallicRoughnessShader(material, metallicRoughnessShader, context);
                     }
                     else
                     {
                         var specularGlossinessShader = materialAsset.Shader as SpecularGlossinessShader;
                         if (specularGlossinessShader != null)
-                            material = material.WithPBRSpecularGlossiness();
+                            SetupSpecularGlossinessShader(material, specularGlossinessShader, context);
                         else
-                            material.WithDefault();
-                    }
-
-                    if (materialAsset.Shader != null)
-                        foreach (var parameter in materialAsset.Shader.Parameters)
                         {
-                            var parameterKey = parameter.Key;
-                            var materialChannel = material.FindChannel(parameterKey);
-                            if (materialChannel != null)
-                            {
-                                if (parameter.Image != null)
-                                {
-                                    var contextTexture = context.Textures[parameter.Image];
-                                    material = material.WithChannelTexture(parameterKey, parameter.TextureCoordinate,
-                                        contextTexture);
-                                }
-
-                                switch (parameter.Key)
-                                {
-                                    case ShaderParameterKey.Emissive:
-                                        if (parameter.Value != ShaderAsset.DefaultEmissive.Value)
-                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
-                                        break;
-                                    case ShaderParameterKey.BaseColor:
-                                        if (parameter.Value != ShaderAsset.DefaultBaseColor.Value)
-                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
-                                        break;
-                                    case ShaderParameterKey.MetallicRoughness:
-                                        if (parameter.Value != ShaderAsset.DefaultMetallicRoughness.Value)
-                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
-                                        break;
-                                    case ShaderParameterKey.Diffuse:
-                                        if (parameter.Value != ShaderAsset.DefaultDiffuse.Value)
-                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
-                                        break;
-                                    case ShaderParameterKey.Normal:
-                                        if (parameter.Value != ShaderAsset.DefaultNormal.Value && parameter.Image != null)
-                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
-                                        break;
-                                    case ShaderParameterKey.SpecularGlossiness:
-                                        if (parameter.Value != ShaderAsset.DefaultSpecularGlossiness.Value)
-                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
-                                        break;
-                                    case ShaderParameterKey.Occlusion:
-                                        if (parameter.Value != ShaderAsset.DefaultOcclusion.Value && parameter.Image != null)
-                                            material = material.WithChannelParameter(parameterKey, parameter.Value);
-                                        break;
-                                    default:
-                                        material = material.WithChannelParameter(parameterKey, parameter.Value);
-                                        break;
-                                }
-                            }
+                            material.WithDefault();
+                            var defaultShader = materialAsset.Shader as ShaderAsset;
+                            if (defaultShader != null)
+                                SetupDefaultShader(material, defaultShader, context);
                         }
+                    }
 
                     context.Materials.Add(materialAsset, material);
                 }
@@ -132,6 +86,58 @@ namespace Toe.ContentPipeline.GLTFSharp
 
                 context.ModelRoot.WriteGLB(stream);
             });
+        }
+
+        private void SetupDefaultShader(Material material, ShaderAsset shader, WriterContext context)
+        {
+            if (TrySetupTexture(material, "Normal", shader.NormalTexture,
+                context))
+            {
+                material.WithChannelParameter("Normal", new Vector4(shader.NormalTextureScale, 0, 0, 0));
+            }
+            if (TrySetupTexture(material, "Occlusion", shader.OcclusionTexture,
+                context))
+            {
+                material.WithChannelParameter("Occlusion", new Vector4(shader.OcclusionTextureStrength, 0, 0, 0));
+            }
+
+            TrySetupTexture(material, "Emissive", shader.EmissiveTexture, context);
+            material.WithChannelParameter("Emissive", new Vector4(shader.EmissiveFactor, 0));
+        }
+
+        private void SetupSpecularGlossinessShader(Material material, SpecularGlossinessShader shader, WriterContext context)
+        {
+            material = material.WithPBRSpecularGlossiness();
+            SetupDefaultShader(material, shader, context);
+
+            TrySetupTexture(material, "Diffuse", shader.DiffuseTexture, context);
+            material.WithChannelParameter("Diffuse", shader.DiffuseFactor);
+            TrySetupTexture(material, "SpecularGlossiness", shader.SpecularGlossinessTexture,context);
+            material.WithChannelParameter("SpecularGlossiness", new Vector4(shader.SpecularFactor, shader.GlossinessFactor));
+
+        }
+
+        private void SetupMetallicRoughnessShader(Material material, MetallicRoughnessShader shader, WriterContext context)
+        {
+            material = material.WithPBRMetallicRoughness();
+            SetupDefaultShader(material, shader, context);
+
+            TrySetupTexture(material, "BaseColor", shader.BaseColorTexture, context);
+            material.WithChannelParameter("BaseColor", shader.BaseColorFactor);
+
+            TrySetupTexture(material, "MetallicRoughness", shader.MetallicRoughnessTexture, context);
+            material.WithChannelParameter("MetallicRoughness", new Vector4(shader.MetallicFactor, shader.RoughnessFactor, 0,0));
+        }
+
+        private static bool TrySetupTexture(Material material, string key, SamplerParameters? samplerParameter, WriterContext context)
+        {
+            if (samplerParameter != null && samplerParameter.Value.Image != null)
+            {
+                material.WithChannelTexture(key, samplerParameter.Value.TextureCoordinate, context.Textures[samplerParameter.Value.Image]);
+                return true;
+            }
+
+            return false;
         }
 
         private SharpGLTF.Schema2.AlphaMode GetAlphaMode(AlphaMode materialAssetAlpha)
