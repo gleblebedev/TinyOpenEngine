@@ -23,16 +23,28 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
 
             for (int i = 1; i < array.Length; ++i)
             {
-                var span0 = new Span<byte>(array, 0, i);
-                var span1 = new Span<byte>(array, i, array.Length-i);
-                var output = new char[5];
+                for (int j = 1; j < array.Length-i; ++j)
+                {
+                    var span0 = new Span<byte>(array, 0, i);
+                    var span1 = new Span<byte>(array, i, j);
+                    var span2 = new Span<byte>(array, i+j, array.Length - i-j);
+                    var output = new char[5];
 
-                var estimatedLength0 = encoding.EstimateCharCount(span0);
-                var res0 = encoding.GetString(span0, new Span<char>(output, 0, estimatedLength0)).ToString();
-                var estimatedLength1 = encoding.EstimateCharCount(span1);
-                var res1 = encoding.GetString(span1, new Span<char>(output, estimatedLength0, estimatedLength1)).ToString();
+                    var estimatedLength0 = encoding.EstimateCharCount(span0);
+                    var res0Len = encoding.GetString(span0, new Span<char>(output, 0, estimatedLength0));
+                    var res0 = new Span<char>(output, 0, res0Len).ToString();
 
-                Assert.AreEqual(str, res0+res1);
+                    var estimatedLength1 = encoding.EstimateCharCount(span1);
+                    var res1Len = encoding.GetString(span1, new Span<char>(output, res0Len, estimatedLength1));
+                    var res1 = new Span<char>(output, res0Len, res1Len).ToString();
+
+
+                    var estimatedLength2 = encoding.EstimateCharCount(span2);
+                    var res2Len = encoding.GetString(span2, new Span<char>(output, res0Len+ res1Len, estimatedLength2));
+                    var res2 = new Span<char>(output, res0Len+ res1Len, res2Len).ToString();
+
+                    Assert.AreEqual(str, res0 + res1+ res2);
+                }
             }
         }
     }

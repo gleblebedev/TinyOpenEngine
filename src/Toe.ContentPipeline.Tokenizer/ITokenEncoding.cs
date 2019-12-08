@@ -6,6 +6,6 @@ namespace Toe.ContentPipeline.Tokenizer
     {
         int EstimateCharCount(in ReadOnlySpan<byte> source);
 
-        Span<char> GetString(in ReadOnlySpan<byte> source, Span<char> destination);
+        int GetString(in ReadOnlySpan<byte> source, Span<char> destination);
     }
 }

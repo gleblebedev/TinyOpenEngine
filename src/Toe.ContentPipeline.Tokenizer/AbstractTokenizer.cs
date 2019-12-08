@@ -63,7 +63,7 @@ namespace Toe.ContentPipeline.Tokenizer
                 _position = 0;
             }
 
-            _end += _encoding.GetString(value, new Span<char>(_buffer,_end, estimatedCount)).Length;
+            _end += _encoding.GetString(value, new Span<char>(_buffer,_end, estimatedCount));
 
             throw new NotImplementedException();
         }

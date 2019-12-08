@@ -5,173 +5,177 @@ namespace Toe.ContentPipeline.Tokenizer
 {
     public class Utf8TokenEncoding : ITokenEncoding
     {
-        internal unsafe struct Utf8Char
+        private int _shift;
+        private uint _leftovers;
+        private Callback _callback;
+
+        public Utf8TokenEncoding()
         {
-            public fixed byte Bytes[4];
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public char AsOneByteChar()
-            {
-                return (char) Bytes[0];
-            }
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public char AsTwoByteChar()
-            {
-                int b0 = Bytes[0] & 0b00011111;
-                int b1 = Bytes[1] & 0b00111111;
-                return (char)((b0 << 6) | b1);
-            }
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public char AsThreeByteChar()
-            {
-                int b0 = Bytes[0] & 0b00001111;
-                int b1 = Bytes[1] & 0b00111111;
-                int b2 = Bytes[2] & 0b00111111;
-                return (char)((b0 << 12) | (b1 << 6) | b2);
-            }
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void AsFourByteChar(in Span<char> dest)
-            {
-                int b0 = Bytes[0] & 0b00000111;
-                int b1 = Bytes[1] & 0b00111111;
-                int b2 = Bytes[2] & 0b00111111;
-                int b3 = Bytes[3] & 0b00111111;
-                var num = (char)((b0 << 18) | (b1 << 12) | (b2 << 6) | (b3));
-                dest[0] = (char)(0xD800 + ((num >> 10) & 0b01111111111));
-                dest[1] = (char)(0xDC00 + (num & 0b01111111111));
-            }
+            _callback = GetStringImpl;
         }
-        public int Position;
-        public int ExpectedLength;
-
-        private Utf8Char _leftovers;
-
 
         public int EstimateCharCount(in ReadOnlySpan<byte> source)
         {
-            if (ExpectedLength > 0)
+            if (_callback != GetStringImpl)
                 return source.Length + 1;
             return source.Length;
         }
 
-        public unsafe Span<char> GetString(in ReadOnlySpan<byte> source, Span<char> destination)
+        private delegate int Callback(in ReadOnlySpan<byte> source, Span<char> destination);
+
+        public int GetString(in ReadOnlySpan<byte> source, Span<char> destination)
+        {
+            return _callback(source, destination);
+        }
+
+        public unsafe int GetStringImpl(in ReadOnlySpan<byte> source, Span<char> destination)
         {
             int dest = 0;
+
+            fixed (byte* bytePtr = &source.GetPinnableReference())
+            {
+                fixed (char* charPtr = &destination.GetPinnableReference())
+                {
+                    var sourceLength = source.Length;
+                    int index = 0;
+                    while (sourceLength-index > 4)
+                    {
+                        uint* uintPtr = (uint*)(bytePtr+index);
+                        if (((*uintPtr) & 0x80808080) == 0)
+                        {
+                            ulong val = *uintPtr;
+                            ulong* dst = (ulong*)(charPtr + dest);
+                            dst[0] =
+                                ((val << (48 - 24)) & 0x00FF000000000000ul)
+                                | ((val << (32 - 16)) & 0x00FF00000000ul)
+                                | ((val << (16 - 8)) & 0x00FF0000ul)
+                                | (val & 0x0FF)
+                                ;
+                            dest += 4;
+                            index += 4;
+                        }
+                        else
+                        {
+                            ParseIndividualSymbols(sourceLength, ref index, bytePtr, charPtr, ref dest, 4);
+                        }
+                    }
+
+                    ParseIndividualSymbols(sourceLength, ref index, bytePtr, charPtr, ref dest, destination.Length-dest);
+                }
+            }
+
+            return dest;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private unsafe void ParseIndividualSymbols(int lastIndex, ref int index, byte* bytePtr, char* charPtr, ref int dest, int takeCount)
+        {
+            while (index < lastIndex && takeCount > 0)
+            {
+                var firstByte = (uint)bytePtr[index];
+                if (firstByte < 0b1000_0000)
+                {
+                    charPtr[dest] = (char) bytePtr[index];
+                    ++dest;
+                    ++index;
+                    --takeCount;
+                }
+                else if (firstByte < 0b1110_0000)
+                {
+                    if (index + 1 < lastIndex)
+                    {
+                        var secondByte = (uint)bytePtr[index+1];
+                        charPtr[dest] = (char) (((firstByte & 0b011111) << 6) | (secondByte & 0b00111111));
+                        ++dest;
+                        index+=2;
+                        --takeCount;
+                    }
+                    else
+                    {
+                        _leftovers = ((firstByte & 0b011111) << 6);
+                        _callback = ContinueMultibyteChar;
+                        _shift = 0;
+                        return;
+                    }
+                }
+                else if (firstByte < 0b1111_0000)
+                {
+                    if (index + 2 < lastIndex)
+                    {
+                        var secondByte = ((uint)bytePtr[index + 1]) & 0b00111111;
+                        var thirdByte = ((uint)bytePtr[index + 2]) & 0b00111111;
+                        charPtr[dest] = (char)(((firstByte & 0b01111) << 12) | (secondByte << 6) | thirdByte);
+                        ++dest;
+                        index += 3;
+                        --takeCount;
+                    }
+                    else
+                    {
+                        _leftovers = ((firstByte & 0b01111) << 12);
+                        ++index;
+                        _shift = 6;
+                        _callback = ContinueMultibyteChar;
+                        ContinueMultibyteChar(new ReadOnlySpan<byte>(bytePtr+1, lastIndex-index), new Span<char>(charPtr, takeCount) );
+                        return;
+                    }
+                }
+                else
+                {
+                    if (index + 3 < lastIndex)
+                    {
+                        var secondByte = ((uint)bytePtr[index + 1]) & 0b00111111;
+                        var thirdByte = ((uint)bytePtr[index + 2]) &0b00111111;
+                        var fourthByte = ((uint)bytePtr[index + 3]) &0b00111111;
+                        var val = (((firstByte & 0b0111) << 18) | (secondByte << 12) | (thirdByte << 6) | fourthByte);
+                        charPtr[dest] = (char)(0xD800 | ((val >> 10) & 0b01111111111));
+                        charPtr[dest+1] = (char)(0xDC00 | (val & 0b01111111111));
+                        dest+=2;
+                        index += 4;
+                        --takeCount;
+                    }
+                    else
+                    {
+                        _leftovers = ((firstByte & 0b0111) << 18);
+                        ++index;
+                        _shift = 12;
+                        _callback = ContinueMultibyteChar;
+                        ContinueMultibyteChar(new ReadOnlySpan<byte>(bytePtr + 1, lastIndex - index), new Span<char>(charPtr, takeCount));
+                        return;
+                    }
+                }
+            }
+        }
+
+        private int ContinueMultibyteChar(in ReadOnlySpan<byte> source, Span<char> destination)
+        {
+            if (source.Length == 0)
+                return 0;
             int index = 0;
-            if (ExpectedLength > 0)
+            for (;;)
             {
-                var toCopy = Math.Min(source.Length, ExpectedLength - Position);
-                for (; index < toCopy; ++index, ++Position)
+                _leftovers |= ((uint) source[index] & 0b00111111) << _shift;
+                ++index;
+                _shift -= 6;
+                if (_shift < 0)
+                    break;
+                if (index >= source.Length)
                 {
-                    _leftovers.Bytes[Position] = source[index];
-                }
-
-                if (ExpectedLength != Position)
-                    return destination.Slice(0, 0);
-                switch (ExpectedLength)
-                {
-                    case 2:
-                        destination[dest] = _leftovers.AsTwoByteChar();
-                        ++dest;
-                        break;
-                    case 3:
-                        destination[dest] = _leftovers.AsThreeByteChar();
-                        ++dest;
-                        break;
-                    case 4:
-                        _leftovers.AsFourByteChar(destination);
-                        dest += 2;
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                ExpectedLength = 0;
-            }
-            Utf8Char currentChar;
-            while (index < source.Length)
-            {
-                currentChar.Bytes[0] = source[index];
-                if (0 == (currentChar.Bytes[0] & 0x80))
-                {
-                    destination[dest] = currentChar.AsOneByteChar();
-                    ++dest;
-                    ++index;
-                    continue;
-                }
-
-                if ((currentChar.Bytes[0] & 0b11100000) == 0b11000000)
-                {
-                    if (source.Length - index < 2)
-                    {
-                        _leftovers.Bytes[0] = currentChar.Bytes[0];
-
-                        Position = 1;
-                        ExpectedLength = 2;
-                        break;
-                    }
-
-                    currentChar.Bytes[1] = source[index + 1];
-                    destination[dest] = currentChar.AsTwoByteChar();
-                    ++dest;
-                    index += 2;
-                    continue;
-                }
-                if ((currentChar.Bytes[0] & 0b11110000) == 0b11100000)
-                {
-                    var presentBytes = source.Length - index;
-                    if (presentBytes < 3)
-                    {
-                        _leftovers.Bytes[0] = currentChar.Bytes[0];
-                        for (int i = 1; i < presentBytes; ++i)
-                        {
-                            _leftovers.Bytes[i] = source[index+i];
-                        }
-                        Position = presentBytes;
-                        ExpectedLength = 3;
-                        break;
-                    }
-
-                    currentChar.Bytes[1] = source[index + 1];
-                    currentChar.Bytes[2] = source[index + 2];
-                    destination[dest] = currentChar.AsThreeByteChar();
-                    ++dest;
-                    index += 3;
-                    continue;
-                }
-                if ((currentChar.Bytes[0] & 0b11111000) == 0b11110000)
-                {
-                    var presentBytes = source.Length - index;
-                    if (presentBytes < 4)
-                    {
-                        _leftovers.Bytes[0] = currentChar.Bytes[0];
-                        for (int i = 1; i < presentBytes; ++i)
-                        {
-                            _leftovers.Bytes[i] = source[index + i];
-                        }
-                        Position = presentBytes;
-                        ExpectedLength = 4;
-                        break;
-                    }
-
-                    currentChar.Bytes[1] = source[index + 1];
-                    currentChar.Bytes[2] = source[index + 2];
-                    currentChar.Bytes[3] = source[index + 3];
-                    currentChar.AsFourByteChar(destination.Slice(dest));
-                    dest+=2;
-                    index += 4;
-                    continue;
-                }
-                // Handle invalid UTF8 as an ascii character
-                {
-                    destination[dest] = (char)currentChar.AsOneByteChar();
-                    ++dest;
-                    ++index;
-                    continue;
+                    return 0;
                 }
             }
 
-            return destination.Slice(0, dest);
+            _callback = GetStringImpl;
+            if (_leftovers < 0x010000)
+            {
+                destination[0] = (char) _leftovers;
+                return GetStringImpl(source.Slice(index), destination.Slice(1)) + 1;
+            }
+            else
+            {
+                destination[0] = (char)(0xD800 + (((_leftovers- 0x10000 )>> 10) & 0b011_1111_1111));
+                destination[1] = (char)(0xDC00 + (_leftovers & 0b011_1111_1111));
+                return GetStringImpl(source.Slice(index), destination.Slice(2)) + 2;
+            }
         }
     }
 }
