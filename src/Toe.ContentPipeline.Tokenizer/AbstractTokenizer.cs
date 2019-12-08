@@ -4,6 +4,8 @@ namespace Toe.ContentPipeline.Tokenizer
 {
     public abstract class AbstractTokenizer<T>: ITokenizer
     {
+        public const char EndOfText = (char) 3;
+        private byte[] _endOfTextArray = new byte[]{3};
         public static readonly ITokenEncoding DefaultEncoding = new AsciiTokenEncoding();
         private readonly ITokenEncoding _encoding;
         private readonly ITokenObserver<T> _observer;
@@ -33,7 +35,7 @@ namespace Toe.ContentPipeline.Tokenizer
 
         public void OnCompleted()
         {
-            Process(ReadOnlySpan<byte>.Empty);
+            Process(_endOfTextArray);
             _observer.OnCompleted();
         }
 
@@ -57,16 +59,36 @@ namespace Toe.ContentPipeline.Tokenizer
             }
             else if (_end + estimatedCount > _buffer.Length)
             {
-                var buffer = _allocationStrategy.Rent(Math.Max(_buffer.Length * 2, _end + estimatedCount));
-                new Span<char>(_buffer, _position, _end - _position).CopyTo(buffer);
-                _end = _end - _position;
-                _position = 0;
+                if (estimatedCount < _position && _position > 32)
+                {
+                    new Span<char>(_buffer, _position, _end-_position).CopyTo(new Span<char>(_buffer, 0, _end - _position));
+                    _end -= _position;
+                    _position = 0;
+                }
+                else
+                {
+                    var buffer = _allocationStrategy.Rent(Math.Max(_buffer.Length * 2, _end + estimatedCount));
+                    new Span<char>(_buffer, _position, _end - _position).CopyTo(buffer);
+                    _end = _end - _position;
+                    _position = 0;
+                    _allocationStrategy.Return(_buffer);
+                    _buffer = buffer;
+                }
             }
 
             _end += _encoding.GetString(value, new Span<char>(_buffer,_end, estimatedCount));
 
-            throw new NotImplementedException();
+            for (;_position < _end;)
+            {
+                var textSpan = new ReadOnlySpan<char>(_buffer, _position, _end - _position);
+                var tokenLen = TryParseToken(textSpan);
+                if (tokenLen < 0)
+                    return;
+                _position += tokenLen;
+            }
         }
+
+        protected abstract int TryParseToken(in ReadOnlySpan<char> textSpan);
 
         protected void Send(T type, in ReadOnlySpan<char> text)
         {

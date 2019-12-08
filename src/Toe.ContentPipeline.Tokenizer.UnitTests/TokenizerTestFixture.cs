@@ -10,11 +10,11 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
     [TestFixture]
     public class TokenizerTestFixture
     {
-        public class TokenObserver: ITokenObserver<DefaultTokenType>
+        public class TokenObserver: ITokenObserver<TokenType>
         {
             public Exception Error;
-            public List<TokenValue<DefaultTokenType>> Tokens  = new List<TokenValue<DefaultTokenType>>();
-            public void OnNext(Token<DefaultTokenType> token)
+            public List<TokenValue<TokenType>> Tokens  = new List<TokenValue<TokenType>>();
+            public void OnNext(Token<TokenType> token)
             {
                 Tokens.Add(token);
             }
@@ -35,7 +35,7 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
         public void OnNext_EmptyString_NoTokensNoErrorNotCompleted()
         {
             var observer = new TokenObserver();
-            var tokenizer = new DefaultTokenizer(observer);
+            var tokenizer = new SimpleTokenizer(observer);
             
             tokenizer.OnNext(ReadOnlySpan<byte>.Empty);
             
@@ -47,7 +47,7 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
         public void OnCompleted_NoTokensNoErrorCompleted()
         {
             var observer = new TokenObserver();
-            var tokenizer = new DefaultTokenizer(observer);
+            var tokenizer = new SimpleTokenizer(observer);
 
             tokenizer.OnCompleted();
 
@@ -59,14 +59,14 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
         public void OnNext_Id_IdCorrectlyParsed()
         {
             var observer = new TokenObserver();
-            var tokenizer = new DefaultTokenizer(observer);
+            var tokenizer = new SimpleTokenizer(observer);
 
             tokenizer.OnNext(Encoding.UTF8.GetBytes("Bla"));
             tokenizer.OnCompleted();
 
             Assert.AreEqual(1, observer.Tokens.Count);
             Assert.AreEqual("Bla", observer.Tokens[0].Value);
-            Assert.AreEqual(DefaultTokenType.Id, observer.Tokens[0].Type);
+            Assert.AreEqual(TokenType.Id, observer.Tokens[0].Type);
             Assert.IsNull(observer.Error);
             Assert.AreEqual(true, observer.IsCompleted);
         }
@@ -74,7 +74,7 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
         public void OnNext_SplittedId_IdCorrectlyParsed()
         {
             var observer = new TokenObserver();
-            var tokenizer = new DefaultTokenizer(observer);
+            var tokenizer = new SimpleTokenizer(observer);
 
             tokenizer.OnNext(Encoding.UTF8.GetBytes("iii"));
             tokenizer.OnNext(Encoding.UTF8.GetBytes("bbb"));
@@ -82,23 +82,23 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
 
             Assert.AreEqual(1, observer.Tokens.Count);
             Assert.AreEqual("iiibbb", observer.Tokens[0].Value);
-            Assert.AreEqual(DefaultTokenType.Id, observer.Tokens[0].Type);
+            Assert.AreEqual(TokenType.Id, observer.Tokens[0].Type);
             Assert.IsNull(observer.Error);
             Assert.AreEqual(true, observer.IsCompleted);
         }
 
         [Test]
-        [TestCase("id", DefaultTokenType.Id)]
-        [TestCase("+", DefaultTokenType.Separator)]
-        [TestCase("-", DefaultTokenType.Separator)]
-        [TestCase(".", DefaultTokenType.Separator)]
-        public void OnNext_CorrectlyParsed(string text, DefaultTokenType type)
+        [TestCase("id", TokenType.Id)]
+        [TestCase("+", TokenType.Separator)]
+        [TestCase("-", TokenType.Separator)]
+        [TestCase(".", TokenType.Separator)]
+        public void OnNext_CorrectlyParsed(string text, TokenType type)
         {
             var buf = Encoding.UTF8.GetBytes(text);
             for (int i = 0; i < text.Length; ++i)
             {
                 var observer = new TokenObserver();
-                var tokenizer = new DefaultTokenizer(observer);
+                var tokenizer = new SimpleTokenizer(observer);
                 tokenizer.OnNext(new Span<byte>(buf, 0, i));
                 tokenizer.OnNext(new Span<byte>(buf, i, buf.Length - i));
                 tokenizer.OnCompleted();
@@ -119,7 +119,7 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
         public void OnNext_SplittedText_TextCorrectlyParsed(int size0, int size1)
         {
             var observer = new TokenObserver();
-            var tokenizer = new DefaultTokenizer(observer);
+            var tokenizer = new SimpleTokenizer(observer);
 
             var buf = Encoding.UTF8.GetBytes("id \tblabla");
             var pos = 0;
@@ -135,11 +135,11 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
             Console.WriteLine(string.Join(Environment.NewLine, observer.Tokens));
             Assert.AreEqual(3, observer.Tokens.Count);
             Assert.AreEqual("id", observer.Tokens[0].Value);
-            Assert.AreEqual(DefaultTokenType.Id, observer.Tokens[0].Type);
+            Assert.AreEqual(TokenType.Id, observer.Tokens[0].Type);
             Assert.AreEqual(" \t", observer.Tokens[1].Value);
-            Assert.AreEqual(DefaultTokenType.Whitespace, observer.Tokens[1].Type);
+            Assert.AreEqual(TokenType.Whitespace, observer.Tokens[1].Type);
             Assert.AreEqual("blabla", observer.Tokens[2].Value);
-            Assert.AreEqual(DefaultTokenType.Id, observer.Tokens[2].Type);
+            Assert.AreEqual(TokenType.Id, observer.Tokens[2].Type);
             Assert.IsNull(observer.Error);
             Assert.AreEqual(true, observer.IsCompleted);
         }

@@ -1,6 +1,6 @@
 ﻿namespace Toe.ContentPipeline.Tokenizer
 {
-    public enum DefaultTokenType
+    public enum TokenType
     {
         Whitespace,
         NewLine,

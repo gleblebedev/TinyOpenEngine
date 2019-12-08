@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Toe.ContentPipeline.Tokenizer
 {
-    public class JsonParser : ITokenObserver<DefaultTokenType>
+    public class JsonParser : ITokenObserver<TokenType>
     {
         Stack<bool> _isInObject = new Stack<bool>();
 
@@ -20,7 +20,7 @@ namespace Toe.ContentPipeline.Tokenizer
         {
 
         }
-        public delegate void Handler(Token<DefaultTokenType> token);
+        public delegate void Handler(Token<TokenType> token);
         private Handler _currentHandler;
 
         private readonly IJsonReader _reader;
@@ -32,11 +32,11 @@ namespace Toe.ContentPipeline.Tokenizer
             _isInObject.Push(true);
         }
 
-        private void HandleValue(Token<DefaultTokenType> token)
+        private void HandleValue(Token<TokenType> token)
         {
             switch (token.Type)
             {
-                case DefaultTokenType.Separator:
+                case TokenType.Separator:
                     if (token.Length == 1)
                     {
                         if (token[0] == '[')
@@ -67,21 +67,21 @@ namespace Toe.ContentPipeline.Tokenizer
                         }
                     }
                     break;
-                case DefaultTokenType.Int:
+                case TokenType.Int:
                     _reader.OnInteger(long.Parse(token.ToString(), CultureInfo.InvariantCulture));
                     _currentHandler = NextAttributeOrEndOfObject;
                     return;
-                case DefaultTokenType.Float:
+                case TokenType.Float:
                     _reader.OnFloat(double.Parse(token.ToString(), CultureInfo.InvariantCulture));
                     _currentHandler = NextAttributeOrEndOfObject;
                     return;
-                case DefaultTokenType.CharConstant:
-                case DefaultTokenType.StringConstant:
-                case DefaultTokenType.String:
+                case TokenType.CharConstant:
+                case TokenType.StringConstant:
+                case TokenType.String:
                     _reader.OnString(token.ToString());
                     _currentHandler = NextAttributeOrEndOfObject;
                     return;
-                case DefaultTokenType.Id:
+                case TokenType.Id:
                     var tokenStr = token.ToString();
                     if (0 == string.Compare(tokenStr, "true", StringComparison.CurrentCultureIgnoreCase))
                     {
@@ -137,7 +137,7 @@ namespace Toe.ContentPipeline.Tokenizer
         }
 
 
-        private void NextAttributeOrEndOfObject(Token<DefaultTokenType> token)
+        private void NextAttributeOrEndOfObject(Token<TokenType> token)
         {
             if (token.Length == 1)
             {
@@ -169,21 +169,21 @@ namespace Toe.ContentPipeline.Tokenizer
             throw new FormatException("Expected , or " + (IsInArray ? "]" : "}"));
         }
 
-        private void HandleAttributeName(Token<DefaultTokenType> token)
+        private void HandleAttributeName(Token<TokenType> token)
         {
             switch (token.Type)
             {
-                case DefaultTokenType.Separator:
+                case TokenType.Separator:
                     if (token[0] == '}')
                     {
                         NextAttributeOrEndOfObject(token);
                         return;
                     }
                     break;
-                case DefaultTokenType.CharConstant:
-                case DefaultTokenType.StringConstant:
-                case DefaultTokenType.String:
-                case DefaultTokenType.Id:
+                case TokenType.CharConstant:
+                case TokenType.StringConstant:
+                case TokenType.String:
+                case TokenType.Id:
                     _reader.OnAttribute(token.ToString());
                     _currentHandler = ExpectAssignOperator;
                     return;
@@ -191,7 +191,7 @@ namespace Toe.ContentPipeline.Tokenizer
             throw new FormatException("Expected attribute name");
         }
 
-        private void ExpectAssignOperator(Token<DefaultTokenType> token)
+        private void ExpectAssignOperator(Token<TokenType> token)
         {
             if (token.Length == 1)
             {
@@ -210,7 +210,7 @@ namespace Toe.ContentPipeline.Tokenizer
             throw new FormatException("Expected :");
         }
 
-        public void OnNext(Token<DefaultTokenType> token)
+        public void OnNext(Token<TokenType> token)
         {
             _currentHandler(token);
         }
