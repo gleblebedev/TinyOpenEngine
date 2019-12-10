@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using System.Text;
+using TokenizerGenerator.Rules;
 
 namespace TokenizerGenerator
 {
@@ -29,8 +29,10 @@ namespace TokenizerGenerator
             return new CharacterRule(character);
         }
   
-        public static ConcatRule Str(string value)
+        public static Rule Str(string value)
         {
+            if (value.Length == 1)
+                return Char(value[0]);
             return new ConcatRule(value.Select(_=>Rule.Char(_)).ToArray());
         }
         public static ConcatRule Concat(params Rule[] rules)

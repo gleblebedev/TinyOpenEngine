@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using TokenType= Toe.ContentPipeline.Tokenizer.SimpleTokenizer.TokenType;
 
 namespace Toe.ContentPipeline.Tokenizer
 {
-    public class JsonParser : ITokenObserver<TokenType>
+    public class JsonParser : ITokenObserver<SimpleTokenizer.TokenType>
     {
         Stack<bool> _isInObject = new Stack<bool>();
 
@@ -20,7 +21,7 @@ namespace Toe.ContentPipeline.Tokenizer
         {
 
         }
-        public delegate void Handler(Token<TokenType> token);
+        public delegate void Handler(Token<SimpleTokenizer.TokenType> token);
         private Handler _currentHandler;
 
         private readonly IJsonReader _reader;
@@ -137,7 +138,7 @@ namespace Toe.ContentPipeline.Tokenizer
         }
 
 
-        private void NextAttributeOrEndOfObject(Token<TokenType> token)
+        private void NextAttributeOrEndOfObject(Token<SimpleTokenizer.TokenType> token)
         {
             if (token.Length == 1)
             {
@@ -169,7 +170,7 @@ namespace Toe.ContentPipeline.Tokenizer
             throw new FormatException("Expected , or " + (IsInArray ? "]" : "}"));
         }
 
-        private void HandleAttributeName(Token<TokenType> token)
+        private void HandleAttributeName(Token<SimpleTokenizer.TokenType> token)
         {
             switch (token.Type)
             {

@@ -80,15 +80,21 @@ namespace Toe.ContentPipeline.Tokenizer
 
             for (;_position < _end;)
             {
-                var textSpan = new ReadOnlySpan<char>(_buffer, _position, _end - _position);
-                var tokenLen = TryParseToken(textSpan);
+                var readOnlySpan = new ReadOnlySpan<char>(_buffer, _position, _end - _position);
+                var tokenLen = TryParseToken(readOnlySpan, 0);
                 if (tokenLen < 0)
                     return;
                 _position += tokenLen;
             }
         }
 
-        protected abstract int TryParseToken(in ReadOnlySpan<char> textSpan);
+        /// <summary>
+        /// Try parse token starting from the start of textSpan.
+        /// </summary>
+        /// <param name="textSpan">Span of chars to analyze.</param>
+        /// <param name="offset">Offset in span</param>
+        /// <returns>Length of recognized token if detected or -1 if the data set doesn't have enough character to recognize a token.</returns>
+        protected abstract int TryParseToken(in ReadOnlySpan<char> textSpan, int offset);
 
         protected void Send(T type, in ReadOnlySpan<char> text)
         {

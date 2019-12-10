@@ -1,4 +1,4 @@
-﻿namespace TokenizerGenerator
+﻿namespace TokenizerGenerator.Rules
 {
     public class RepeatRule : Rule
     {

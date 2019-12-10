@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;
+using TokenType = Toe.ContentPipeline.Tokenizer.SimpleTokenizer.TokenType;
 
 namespace Toe.ContentPipeline.Tokenizer.UnitTests
 {
