@@ -1,11 +1,8 @@
-﻿using System;
-using BenchmarkDotNet.Running;
-
-namespace Toe.ContentPipeline.Tokenizer.Benchmark
+﻿namespace Toe.ContentPipeline.Tokenizer.Benchmark
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
 #if DEBUG
             //new Utf8TokenEncodingBenchmark().AseFile();

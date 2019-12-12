@@ -2,7 +2,6 @@
 
 namespace Toe.ContentPipeline.Tokenizer
 {
-
     public class AsciiTokenEncoding : ITokenEncoding
     {
         public int EstimateCharCount(in ReadOnlySpan<byte> source)
@@ -17,13 +16,13 @@ namespace Toe.ContentPipeline.Tokenizer
                 fixed (char* charPtr = &destination.GetPinnableReference())
                 {
                     var sourceLength = source.Length;
-                    int dest = 0;
-                    int index = 0;
+                    var dest = 0;
+                    var index = 0;
                     while (sourceLength - index > 4)
                     {
-                        uint* uintPtr = (uint*)(bytePtr + index);
+                        var uintPtr = (uint*) (bytePtr + index);
                         ulong val = *uintPtr;
-                        ulong* dst = (ulong*)(charPtr + dest);
+                        var dst = (ulong*) (charPtr + dest);
                         dst[0] =
                             ((val << (48 - 24)) & 0x00FF000000000000ul)
                             | ((val << (32 - 16)) & 0x00FF00000000ul)
@@ -36,10 +35,11 @@ namespace Toe.ContentPipeline.Tokenizer
 
                     while (sourceLength - index > 0)
                     {
-                        charPtr[dest] = (char)bytePtr[index];
+                        charPtr[dest] = (char) bytePtr[index];
                         ++dest;
                         ++index;
                     }
+
                     return dest;
                 }
             }

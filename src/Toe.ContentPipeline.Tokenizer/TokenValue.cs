@@ -4,8 +4,8 @@
     {
         public TokenValue(Token<T> token)
         {
-            this.Type = token.Type;
-            this.Value = token.ToString();
+            Type = token.Type;
+            Value = token.ToString();
         }
 
         public string Value { get; set; }

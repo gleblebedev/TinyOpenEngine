@@ -1,30 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using TokenType= Toe.ContentPipeline.Tokenizer.SimpleTokenizer.TokenType;
 
 namespace Toe.ContentPipeline.Tokenizer
 {
     public class JsonParser : ITokenObserver<SimpleTokenizer.TokenType>
     {
-        Stack<bool> _isInObject = new Stack<bool>();
-
-        private bool IsInObject
-        {
-            get { return _isInObject.Peek(); }
-        }
-        private bool IsInArray
-        {
-            get { return !_isInObject.Peek(); }
-        }
-        public JsonParser()
-        {
-
-        }
         public delegate void Handler(Token<SimpleTokenizer.TokenType> token);
-        private Handler _currentHandler;
 
         private readonly IJsonReader _reader;
+        private Handler _currentHandler;
+        private readonly Stack<bool> _isInObject = new Stack<bool>();
+
+        public JsonParser()
+        {
+        }
 
         public JsonParser(IJsonReader reader)
         {
@@ -33,11 +23,30 @@ namespace Toe.ContentPipeline.Tokenizer
             _isInObject.Push(true);
         }
 
-        private void HandleValue(Token<TokenType> token)
+        private bool IsInObject => _isInObject.Peek();
+
+        private bool IsInArray => !_isInObject.Peek();
+
+        public void OnNext(Token<SimpleTokenizer.TokenType> token)
+        {
+            _currentHandler(token);
+        }
+
+        public void OnError(Exception exception)
+        {
+            _reader.OnError(exception);
+        }
+
+        public void OnCompleted()
+        {
+            _reader.OnCompleted();
+        }
+
+        private void HandleValue(Token<SimpleTokenizer.TokenType> token)
         {
             switch (token.Type)
             {
-                case TokenType.Separator:
+                case SimpleTokenizer.TokenType.Separator:
                     if (token.Length == 1)
                     {
                         if (token[0] == '[')
@@ -45,61 +54,57 @@ namespace Toe.ContentPipeline.Tokenizer
                             StartArray();
                             return;
                         }
+
                         if (token[0] == ']')
                         {
                             EndArray();
                             return;
                         }
-                        else if (token[0] == '{')
+
+                        if (token[0] == '{')
                         {
                             StartObject();
                             return;
                         }
-                        else if (token[0] == '}')
+
+                        if (token[0] == '}')
                         {
                             EndObject();
                             return;
                         }
+
                         if (token[0] == ',')
                         {
                             _reader.OnNull();
                             NextAttributeOrEndOfObject(token);
-                            return;
                         }
                     }
+
                     break;
-                case TokenType.Int:
+                case SimpleTokenizer.TokenType.Int:
                     _reader.OnInteger(long.Parse(token.ToString(), CultureInfo.InvariantCulture));
                     _currentHandler = NextAttributeOrEndOfObject;
                     return;
-                case TokenType.Float:
+                case SimpleTokenizer.TokenType.Float:
                     _reader.OnFloat(double.Parse(token.ToString(), CultureInfo.InvariantCulture));
                     _currentHandler = NextAttributeOrEndOfObject;
                     return;
-                case TokenType.CharConstant:
-                case TokenType.StringConstant:
-                case TokenType.String:
+                case SimpleTokenizer.TokenType.CharConstant:
+                case SimpleTokenizer.TokenType.StringConstant:
+                case SimpleTokenizer.TokenType.String:
                     _reader.OnString(token.ToString());
                     _currentHandler = NextAttributeOrEndOfObject;
                     return;
-                case TokenType.Id:
+                case SimpleTokenizer.TokenType.Id:
                     var tokenStr = token.ToString();
                     if (0 == string.Compare(tokenStr, "true", StringComparison.CurrentCultureIgnoreCase))
-                    {
                         _reader.OnBool(true);
-                    }
                     else if (0 == string.Compare(tokenStr, "false", StringComparison.CurrentCultureIgnoreCase))
-                    {
                         _reader.OnBool(false);
-                    }
                     else if (0 == string.Compare(tokenStr, "null", StringComparison.CurrentCultureIgnoreCase))
-                    {
                         _reader.OnNull();
-                    }
                     else
-                    {
                         _reader.OnString(tokenStr);
-                    }
 
                     _currentHandler = NextAttributeOrEndOfObject;
                     break;
@@ -114,20 +119,23 @@ namespace Toe.ContentPipeline.Tokenizer
             _reader.OnStartArray();
             _currentHandler = HandleValue;
         }
+
         private void StartObject()
         {
             _isInObject.Push(true);
             _reader.OnStartObject();
             _currentHandler = HandleAttributeName;
         }
+
         private void EndArray()
         {
             var res = _isInObject.Pop();
-            if (res == true)
+            if (res)
                 throw new FormatException("Expected object end but found an end of array.");
             _reader.OnEndArray();
             _currentHandler = NextAttributeOrEndOfObject;
         }
+
         private void EndObject()
         {
             var res = _isInObject.Pop();
@@ -157,16 +165,13 @@ namespace Toe.ContentPipeline.Tokenizer
                 if (token[0] == ',')
                 {
                     if (IsInArray)
-                    {
                         _currentHandler = HandleValue;
-                    }
                     else
-                    {
                         _currentHandler = HandleAttributeName;
-                    }
                     return;
                 }
             }
+
             throw new FormatException("Expected , or " + (IsInArray ? "]" : "}"));
         }
 
@@ -174,25 +179,27 @@ namespace Toe.ContentPipeline.Tokenizer
         {
             switch (token.Type)
             {
-                case TokenType.Separator:
+                case SimpleTokenizer.TokenType.Separator:
                     if (token[0] == '}')
                     {
                         NextAttributeOrEndOfObject(token);
                         return;
                     }
+
                     break;
-                case TokenType.CharConstant:
-                case TokenType.StringConstant:
-                case TokenType.String:
-                case TokenType.Id:
+                case SimpleTokenizer.TokenType.CharConstant:
+                case SimpleTokenizer.TokenType.StringConstant:
+                case SimpleTokenizer.TokenType.String:
+                case SimpleTokenizer.TokenType.Id:
                     _reader.OnAttribute(token.ToString());
                     _currentHandler = ExpectAssignOperator;
                     return;
             }
+
             throw new FormatException("Expected attribute name");
         }
 
-        private void ExpectAssignOperator(Token<TokenType> token)
+        private void ExpectAssignOperator(Token<SimpleTokenizer.TokenType> token)
         {
             if (token.Length == 1)
             {
@@ -201,6 +208,7 @@ namespace Toe.ContentPipeline.Tokenizer
                     _currentHandler = HandleValue;
                     return;
                 }
+
                 if (token[0] == ',')
                 {
                     _reader.OnAttributeNull();
@@ -208,22 +216,8 @@ namespace Toe.ContentPipeline.Tokenizer
                     return;
                 }
             }
+
             throw new FormatException("Expected :");
-        }
-
-        public void OnNext(Token<TokenType> token)
-        {
-            _currentHandler(token);
-        }
-
-        public void OnError(Exception exception)
-        {
-            _reader.OnError(exception);
-        }
-
-        public void OnCompleted()
-        {
-            _reader.OnCompleted();
         }
     }
 }

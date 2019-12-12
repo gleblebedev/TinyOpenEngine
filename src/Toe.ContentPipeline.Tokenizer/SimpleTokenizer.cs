@@ -19,66 +19,110 @@ namespace Toe.ContentPipeline.Tokenizer
             CharConstant
         }
 
-        public SimpleTokenizer(ITokenObserver<TokenType> observer, ITokenEncoding encoding) : base(observer, encoding) { }
-        public SimpleTokenizer(ITokenObserver<TokenType> observer) : base(observer) { }
+        public SimpleTokenizer(ITokenObserver<TokenType> observer, ITokenEncoding encoding) : base(observer, encoding)
+        {
+        }
 
-        public SimpleTokenizer(ITokenObserver<TokenType> observer, IAllocationStrategy allocationStrategy) : base(observer, allocationStrategy) { }
+        public SimpleTokenizer(ITokenObserver<TokenType> observer) : base(observer)
+        {
+        }
 
-        public SimpleTokenizer(ITokenObserver<TokenType> observer, IAllocationStrategy allocationStrategy, ITokenEncoding encoding):base(observer, allocationStrategy, encoding) { }
+        public SimpleTokenizer(ITokenObserver<TokenType> observer, IAllocationStrategy allocationStrategy) : base(
+            observer, allocationStrategy)
+        {
+        }
+
+        public SimpleTokenizer(ITokenObserver<TokenType> observer, IAllocationStrategy allocationStrategy,
+            ITokenEncoding encoding) : base(observer, allocationStrategy, encoding)
+        {
+        }
 
         protected override int TryParseToken(in ReadOnlySpan<char> textSpan, int offset)
         {
-            switch (textSpan[offset])
+            int res;
+
+            //End of file
+            if (textSpan[0] == 3)
+                return 1;
+
+            res = TryParseWhitespace(textSpan, offset);
+            if (IsMatchOrInconclusive(res))
+                return res;
+
+            res = TryParseNewLine(textSpan, offset);
+            if (IsMatch(res)) return res;
+
+            return TryParseId(textSpan, offset);
+        }
+
+        private int TryParseId(in ReadOnlySpan<char> textSpan, int offset)
+        {
+            var start = offset;
+            while (offset < textSpan.Length)
             {
-                case ' ':
-                    return TryParseWhitespace(textSpan, offset + 1);
-                default:
-                    return -1;
+                if (char.IsWhiteSpace(textSpan[offset]))
+                    break;
+                if (textSpan[offset] == '\r' || textSpan[offset] == '\n')
+                    break;
+                ++offset;
             }
-            if (char.IsWhiteSpace(textSpan[0]))
+
+            if (start > 0)
             {
-                for (int i = 1; i < textSpan.Length; ++i)
+                Send(TokenType.Id, textSpan.Slice(0, offset));
+                return start;
+            }
+
+            return Mismatch;
+        }
+
+        private int TryParseNewLine(in ReadOnlySpan<char> textSpan, int offset)
+        {
+            if (textSpan.Length - offset < 2)
+                return Inconslusive;
+            if (textSpan[offset] == '\n')
+            {
+                if (textSpan[offset + 1] == '\r')
                 {
-                    if (!char.IsWhiteSpace(textSpan[i]) || textSpan[i] == EndOfText)
-                    {
-                        Send(TokenType.Whitespace, textSpan.Slice(0,i));
-                        return i;
-                    }
+                    Send(TokenType.NewLine, textSpan.Slice(0, 2));
+                    return 2;
                 }
 
-                return -1;
+                Send(TokenType.NewLine, textSpan.Slice(0, 1));
+                return 1;
             }
-            else
+
+            if (textSpan[offset] == '\r')
             {
-                if (textSpan[0] == EndOfText)
-                    return 1;
-                for (int i = 1; i < textSpan.Length; ++i)
+                if (textSpan[offset + 1] == '\n')
                 {
-                    if (char.IsWhiteSpace(textSpan[i]) || textSpan[i] == EndOfText)
-                    {
-                        Send(TokenType.Id, textSpan.Slice(0, i));
-                        return i;
-                    }
+                    Send(TokenType.NewLine, textSpan.Slice(0, 2));
+                    return 2;
                 }
-                return -1;
+
+                Send(TokenType.NewLine, textSpan.Slice(0, 1));
+                return 1;
             }
+
+            return Mismatch;
         }
+
 
         private int TryParseWhitespace(in ReadOnlySpan<char> textSpan, int offset)
         {
+            if (!char.IsWhiteSpace(textSpan[offset])) return Mismatch;
             while (offset < textSpan.Length)
             {
-                switch (textSpan[offset])
+                if (!char.IsWhiteSpace(textSpan[offset]))
                 {
-                    case ' ':
-                        ++offset;
-                        break;
-                    default:
-                        return offset;
+                    Send(TokenType.Whitespace, textSpan.Slice(0, offset));
+                    return offset;
                 }
+
+                ++offset;
             }
 
-            return offset;
+            return Inconslusive;
         }
     }
 }

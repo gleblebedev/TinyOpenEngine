@@ -2,20 +2,21 @@
 
 namespace Toe.ContentPipeline.Tokenizer
 {
-    public class ArrayPoolAllocationStrategy: IAllocationStrategy
+    public class ArrayPoolAllocationStrategy : IAllocationStrategy
     {
         private readonly int _alignment;
-        ArrayPool<char> _arrayPool;
+        private readonly ArrayPool<char> _arrayPool;
 
         public ArrayPoolAllocationStrategy(int alignment = 1024) : this(ArrayPool<char>.Shared, alignment)
         {
-
         }
+
         public ArrayPoolAllocationStrategy(ArrayPool<char> pool, int alignment = 1024)
         {
             _alignment = alignment;
             _arrayPool = pool;
         }
+
         public char[] Rent(int minSize)
         {
             var count = (minSize + _alignment - 1) / _alignment;

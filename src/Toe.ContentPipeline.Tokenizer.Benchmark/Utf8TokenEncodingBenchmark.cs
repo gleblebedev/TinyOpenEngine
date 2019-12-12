@@ -8,13 +8,14 @@ namespace Toe.ContentPipeline.Tokenizer.Benchmark
 {
     public class Utf8TokenEncodingBenchmark
     {
-        private byte[] _binaryFile;
-        private byte[] _twoByteChars;
+        private readonly byte[] _binaryFile;
+        private readonly byte[] _twoByteChars;
 
         public Utf8TokenEncodingBenchmark()
         {
             _binaryFile = File.ReadAllBytes("Ase.ase");
-            _twoByteChars = Encoding.UTF8.GetBytes(Enumerable.Range(0x80,0x07FF-0x80).Select(_=>(char)_).ToArray());
+            _twoByteChars =
+                Encoding.UTF8.GetBytes(Enumerable.Range(0x80, 0x07FF - 0x80).Select(_ => (char) _).ToArray());
         }
 
         [Benchmark]
@@ -34,11 +35,9 @@ namespace Toe.ContentPipeline.Tokenizer.Benchmark
             var encoding = new Utf8TokenEncoding();
             var blockSize = 1024;
             var blockOutput = new char[1024];
-            for (int i = 0; i < source.Length; i += blockSize)
-            {
+            for (var i = 0; i < source.Length; i += blockSize)
                 encoding.GetString(new ReadOnlySpan<byte>(source, i, Math.Min(blockSize, source.Length - i)),
                     new Span<char>(blockOutput));
-            }
         }
     }
 }

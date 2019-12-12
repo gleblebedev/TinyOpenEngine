@@ -7,6 +7,6 @@
         Concat,
         Char,
         Optional,
-        Repeat  
+        Repeat
     }
 }

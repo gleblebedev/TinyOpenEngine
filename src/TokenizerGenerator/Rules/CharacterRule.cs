@@ -10,5 +10,15 @@
         public char Character { get; }
 
         public override RuleType Type => RuleType.Char;
+
+        public override LeadingChars EvaluateLeadingSymbols()
+        {
+            return new LeadingChars(false, new[] {Character});
+        }
+
+        public override string ToString()
+        {
+            return $"\'{Character}\'";
+        }
     }
 }
