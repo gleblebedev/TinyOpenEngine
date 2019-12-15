@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Toe.ContentPipeline
@@ -10,5 +11,7 @@ namespace Toe.ContentPipeline
         string FileExtension { get; }
 
         ValueTask<ArraySegment<byte>> GetContentAsync();
+
+        ValueTask<Stream> OpenAsync();
     }
 }

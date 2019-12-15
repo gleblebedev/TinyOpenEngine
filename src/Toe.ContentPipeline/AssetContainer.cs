@@ -48,19 +48,7 @@ namespace Toe.ContentPipeline
         {
             return ((IEnumerable) _list).GetEnumerator();
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        IEnumerator<KeyValuePair<string, T>> IEnumerable<KeyValuePair<string, T>>.GetEnumerator()
-        {
-            return ((IDictionary<string, T>) _map).GetEnumerator();
-        }
-
-        int IReadOnlyCollection<KeyValuePair<string, T>>.Count
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _list.Count;
-        }
-
+        
         public bool ContainsKey(string key)
         {
             return _map.ContainsKey(key);

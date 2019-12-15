@@ -5,9 +5,9 @@ namespace Toe.ContentPipeline
 {
     public class FileReferenceImage : AbstractImageAsset
     {
-        protected override Task<Stream> GetStreamAsync()
+        protected override ValueTask<Stream> GetStreamAsync()
         {
-            return Task.FromResult((Stream) File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            return new ValueTask<Stream>((Stream) File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Toe.ContentPipeline
@@ -18,9 +19,9 @@ namespace Toe.ContentPipeline
             return new ValueTask<ArraySegment<byte>>(RawData);
         }
 
-        protected override Task<Stream> GetStreamAsync()
+        protected override ValueTask<Stream> GetStreamAsync()
         {
-            throw new NotImplementedException();
+            return new ValueTask<Stream>(new MemoryStream(RawData.ToArray()));
         }
     }
 }

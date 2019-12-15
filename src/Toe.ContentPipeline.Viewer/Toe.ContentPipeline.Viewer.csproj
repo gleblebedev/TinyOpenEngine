@@ -14,7 +14,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Toe.ContentPipeline.Ase\Toe.ContentPipeline.Ase.csproj" />
+    <ProjectReference Include="..\Toe.ContentPipeline.BSP\Toe.ContentPipeline.BSP.csproj" />
+    <ProjectReference Include="..\Toe.ContentPipeline.Collada\Toe.ContentPipeline.Collada.csproj" />
+    <ProjectReference Include="..\Toe.ContentPipeline.FBXSharp\Toe.ContentPipeline.FBXSharp.csproj" />
+    <ProjectReference Include="..\Toe.ContentPipeline.GLTFSharp\Toe.ContentPipeline.GLTFSharp.csproj" />
+    <ProjectReference Include="..\Toe.ContentPipeline.Obj\Toe.ContentPipeline.Obj.csproj" />
     <ProjectReference Include="..\Toe.ContentPipeline.Preview\Toe.ContentPipeline.Preview.csproj" />
+    <ProjectReference Include="..\Toe.ContentPipeline.Tokenizer\Toe.ContentPipeline.Tokenizer.csproj" />
+    <ProjectReference Include="..\Toe.ContentPipeline.Xyz\Toe.ContentPipeline.Xyz.csproj" />
+    <ProjectReference Include="..\Toe.ContentPipeline\Toe.ContentPipeline.csproj" />
+    <ProjectReference Include="..\Toe.Math\Toe.Math.csproj" />
   </ItemGroup>
 
 </Project>

@@ -14,4 +14,10 @@
     <PackageReference Include="Veldrid.Utilities" Version="4.7.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Toe.ContentPipeline\Toe.ContentPipeline.csproj" />
+    <ProjectReference Include="..\Toe.Math\Toe.Math.csproj" />
+    <ProjectReference Include="..\Toe.SceneGraph\Toe.SceneGraph.csproj" />
+  </ItemGroup>
+
 </Project>

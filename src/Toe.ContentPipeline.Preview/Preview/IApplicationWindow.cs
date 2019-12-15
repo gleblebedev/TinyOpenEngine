@@ -10,7 +10,7 @@ namespace Toe.ContentPipeline.Preview
         uint Height { get; }
 
         event Action<float> Rendering;
-        event Action<GraphicsDevice, ResourceFactory, Swapchain> GraphicsDeviceCreated;
+        event Action<VeldridContext> GraphicsDeviceCreated;
         event Action GraphicsDeviceDestroyed;
         event Action Resized;
 

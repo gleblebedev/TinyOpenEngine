@@ -12,14 +12,17 @@ namespace Toe.ContentPipeline.GLTFSharp
     public class GltfSharpReader : IStreamReader
     {
         private readonly ReadSettings _readSettings;
-
-        public GltfSharpReader(AssetReader assetReader = null, bool skipValidation = true)
+        public GltfSharpReader(AssetReader assetReader, bool skipValidation = true)
         {
             _readSettings = new ReadSettings
             {
                 FileReader = assetReader,
                 SkipValidation = skipValidation
             };
+        }
+
+        public GltfSharpReader(bool skipValidation = true):this(null, skipValidation)
+        {
         }
 
         public Task<IContentContainer> ReadAsync(Stream stream)

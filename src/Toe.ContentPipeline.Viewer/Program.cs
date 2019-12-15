@@ -18,7 +18,7 @@ namespace Toe.ContentPipeline.Viewer
 
             VeldridStartupWindow window = new VeldridStartupWindow("glTF Viewer", options?.Value ?? new ViewerOptions());
 
-            SceneRenderer sceneRenderer = new SceneRenderer(window, options.Value.FileName);
+            SceneRenderer sceneRenderer = new SceneRenderer(window, new Toe.ContentPipeline.GLTFSharp.GltfSharpReader().Load(options.Value.FileName));
             window.Run();
         }
     }

@@ -14,9 +14,8 @@ namespace Toe.ContentPipeline.Viewer
     {
         private readonly ViewerOptions _options;
         private readonly Sdl2Window _window;
-        private DisposeCollectorResourceFactory _factory;
-        private GraphicsDevice _gd;
         private bool _windowResized = true;
+        private VeldridContext _veldrid;
 
         public VeldridStartupWindow(string title, ViewerOptions options)
         {
@@ -36,7 +35,7 @@ namespace Toe.ContentPipeline.Viewer
         }
 
         public event Action<float> Rendering;
-        public event Action<GraphicsDevice, ResourceFactory, Swapchain> GraphicsDeviceCreated;
+        public event Action<VeldridContext> GraphicsDeviceCreated;
         public event Action GraphicsDeviceDestroyed;
         public event Action Resized;
 
@@ -56,12 +55,15 @@ namespace Toe.ContentPipeline.Viewer
 #if DEBUG
             options.Debug = true;
 #endif
+            GraphicsDevice gd;
             if (_options.GraphicsBackend.HasValue)
-                _gd = VeldridStartup.CreateGraphicsDevice(_window, options, _options.GraphicsBackend.Value);
+                gd = VeldridStartup.CreateGraphicsDevice(_window, options, _options.GraphicsBackend.Value);
             else
-                _gd = VeldridStartup.CreateGraphicsDevice(_window, options);
-            _factory = new DisposeCollectorResourceFactory(_gd.ResourceFactory);
-            GraphicsDeviceCreated?.Invoke(_gd, _factory, _gd.MainSwapchain);
+                gd = VeldridStartup.CreateGraphicsDevice(_window, options);
+            var factory = new DisposeCollectorResourceFactory(gd.ResourceFactory);
+
+            _veldrid = new VeldridContext(gd, factory, gd.MainSwapchain);
+            GraphicsDeviceCreated?.Invoke(_veldrid);
 
             var sw = Stopwatch.StartNew();
             var previousElapsed = sw.Elapsed.TotalSeconds;
@@ -79,7 +81,7 @@ namespace Toe.ContentPipeline.Viewer
                     if (_windowResized)
                     {
                         _windowResized = false;
-                        _gd.ResizeMainWindow((uint)_window.Width, (uint)_window.Height);
+                        gd.ResizeMainWindow((uint)_window.Width, (uint)_window.Height);
                         Resized?.Invoke();
                     }
 
@@ -87,9 +89,9 @@ namespace Toe.ContentPipeline.Viewer
                 }
             }
 
-            _gd.WaitForIdle();
-            _factory.DisposeCollector.DisposeAll();
-            _gd.Dispose();
+            gd.WaitForIdle();
+            factory.DisposeCollector.DisposeAll();
+            gd.Dispose();
             GraphicsDeviceDestroyed?.Invoke();
         }
 

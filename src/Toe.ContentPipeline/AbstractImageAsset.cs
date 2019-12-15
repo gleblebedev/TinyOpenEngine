@@ -30,7 +30,12 @@ namespace Toe.ContentPipeline
             }
         }
 
-        protected abstract Task<Stream> GetStreamAsync();
+        public async ValueTask<Stream> OpenAsync()
+        {
+            return await GetStreamAsync();
+        }
+
+        protected abstract ValueTask<Stream> GetStreamAsync();
 
         public override string ToString()
         {

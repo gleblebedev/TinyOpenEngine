@@ -13,6 +13,11 @@ namespace Toe.ContentPipeline
             return new ShaderParameter<T>(key, value);
         }
 
+        public static IContentContainer Load(this IStreamReader reader, string fileName)
+        {
+            return LoadAsync(reader, fileName).Result;
+        }
+
         public static async Task<IContentContainer> LoadAsync(this IStreamReader reader, string fileName)
         {
             using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))

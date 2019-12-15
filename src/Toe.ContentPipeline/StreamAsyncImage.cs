@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace Toe.ContentPipeline
 {
-    public class StreamImage : AbstractImageAsset
+    public class StreamAsyncImage : AbstractImageAsset
     {
-        private readonly Func<Stream> _streamFactory;
+        private readonly Func<Task<Stream>> _streamFactory;
 
-        public StreamImage(Func<Stream> streamFactory)
+        public StreamAsyncImage(Func<Task<Stream>> streamFactory)
         {
             _streamFactory = streamFactory;
         }
