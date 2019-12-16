@@ -67,15 +67,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AsyncDependency", "AsyncDep
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xyz", "Xyz", "{E71373A9-C2D4-4205-BC79-B31B5EFA056E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toe.ContentPipeline.Xyz", "Toe.ContentPipeline.Xyz\Toe.ContentPipeline.Xyz.csproj", "{E14214AC-7D9E-45C1-A5A9-04F803A4C3BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toe.ContentPipeline.Xyz", "Toe.ContentPipeline.Xyz\Toe.ContentPipeline.Xyz.csproj", "{E14214AC-7D9E-45C1-A5A9-04F803A4C3BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toe.ContentPipeline.Ase", "Toe.ContentPipeline.Ase\Toe.ContentPipeline.Ase.csproj", "{C42E62E6-8133-4338-AC55-234F68A5F6B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toe.ContentPipeline.Ase", "Toe.ContentPipeline.Ase\Toe.ContentPipeline.Ase.csproj", "{C42E62E6-8133-4338-AC55-234F68A5F6B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toe.ContentPipeline.BSP", "Toe.ContentPipeline.BSP\Toe.ContentPipeline.BSP.csproj", "{B09A0398-C443-4480-A58D-F72E6A7AA133}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toe.ContentPipeline.BSP", "Toe.ContentPipeline.BSP\Toe.ContentPipeline.BSP.csproj", "{B09A0398-C443-4480-A58D-F72E6A7AA133}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toe.ContentPipeline.Collada", "Toe.ContentPipeline.Collada\Toe.ContentPipeline.Collada.csproj", "{0CDCBC2B-68BA-4855-B1A8-90FA83FB6639}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toe.ContentPipeline.Collada", "Toe.ContentPipeline.Collada\Toe.ContentPipeline.Collada.csproj", "{0CDCBC2B-68BA-4855-B1A8-90FA83FB6639}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toe.ContentPipeline.Obj", "Toe.ContentPipeline.Obj\Toe.ContentPipeline.Obj.csproj", "{D9BBCB9E-4C48-459F-9F6D-2360B99D480C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toe.ContentPipeline.Obj", "Toe.ContentPipeline.Obj\Toe.ContentPipeline.Obj.csproj", "{D9BBCB9E-4C48-459F-9F6D-2360B99D480C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Veldrid", "Veldrid", "{46B64277-DD9C-4A0C-A41A-4CC92D021075}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toe.VeldridRender", "Toe.VeldridRender\Toe.VeldridRender.csproj", "{056C250E-08F6-41D9-A8E8-D221FA101C30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -171,6 +175,10 @@ Global
 		{D9BBCB9E-4C48-459F-9F6D-2360B99D480C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9BBCB9E-4C48-459F-9F6D-2360B99D480C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9BBCB9E-4C48-459F-9F6D-2360B99D480C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{056C250E-08F6-41D9-A8E8-D221FA101C30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{056C250E-08F6-41D9-A8E8-D221FA101C30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{056C250E-08F6-41D9-A8E8-D221FA101C30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{056C250E-08F6-41D9-A8E8-D221FA101C30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -211,6 +219,8 @@ Global
 		{B09A0398-C443-4480-A58D-F72E6A7AA133} = {DA678346-E61B-4192-B915-E9FDAC552CF7}
 		{0CDCBC2B-68BA-4855-B1A8-90FA83FB6639} = {0ED3B336-9FD3-403F-B7D0-D0F1C650CF11}
 		{D9BBCB9E-4C48-459F-9F6D-2360B99D480C} = {D4069F45-0F36-498D-931A-E7AFA38188F2}
+		{46B64277-DD9C-4A0C-A41A-4CC92D021075} = {2EC7D835-0F6E-4F19-9916-08EE3CF67301}
+		{056C250E-08F6-41D9-A8E8-D221FA101C30} = {46B64277-DD9C-4A0C-A41A-4CC92D021075}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5D0DC143-823F-4C69-AB0D-47F4F16A0982}
