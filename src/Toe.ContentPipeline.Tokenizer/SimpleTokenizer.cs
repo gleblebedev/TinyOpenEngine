@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Toe.ContentPipeline.Tokenizer
 {
@@ -42,7 +43,7 @@ namespace Toe.ContentPipeline.Tokenizer
             int res;
 
             //End of file
-            if (textSpan[0] == 3)
+            if (IsEndOfText(textSpan[0]))
                 return 1;
 
             res = TryParseWhitespace(textSpan, offset);
@@ -50,9 +51,87 @@ namespace Toe.ContentPipeline.Tokenizer
                 return res;
 
             res = TryParseNewLine(textSpan, offset);
-            if (IsMatch(res)) return res;
+            if (IsMatchOrInconclusive(res)) return res;
+
+            res = TryParseFloat(textSpan, offset);
+            if (IsMatchOrInconclusive(res)) return res;
+
+            res = TryParseSeparator(textSpan, offset);
+            if (IsMatchOrInconclusive(res)) return res;
 
             return TryParseId(textSpan, offset);
+        }
+
+        private int TryParseSeparator(in ReadOnlySpan<char> textSpan, int offset)
+        {
+            if (IsSeparator(textSpan[0]))
+            {
+                Send(TokenType.Separator, textSpan.Slice(0,1));
+                return 1;
+            }
+            return Mismatch;
+        }
+
+        private bool IsSeparator(char value)
+        {
+            switch (value)
+            {
+                case '!':
+                    return true;
+                case '#':
+                    return true;
+                case '$':
+                    return true;
+                case '%':
+                    return true;
+                case '&':
+                    return true;
+                case '(':
+                    return true;
+                case ')':
+                    return true;
+                case '*':
+                    return true;
+                case '+':
+                    return true;
+                case ',':
+                    return true;
+                case '-':
+                    return true;
+                case '.':
+                    return true;
+                case '/':
+                    return true;
+                case ':':
+                    return true;
+                case ';':
+                    return true;
+                case '<':
+                    return true;
+                case '=':
+                    return true;
+                case '>':
+                    return true;
+                case '?':
+                    return true;
+                case '@':
+                    return true;
+                case '[':
+                    return true;
+                case '\\':
+                    return true;
+                case ']':
+                    return true;
+                case '{':
+                    return true;
+                case '}':
+                    return true;
+                case '^':
+                    return true;
+                case '`':
+                    return true;
+            }
+            return false;
         }
 
         private int TryParseId(in ReadOnlySpan<char> textSpan, int offset)
@@ -60,20 +139,93 @@ namespace Toe.ContentPipeline.Tokenizer
             var start = offset;
             while (offset < textSpan.Length)
             {
-                if (char.IsWhiteSpace(textSpan[offset]))
-                    break;
-                if (textSpan[offset] == '\r' || textSpan[offset] == '\n')
-                    break;
+                var c = textSpan[offset];
+                if (char.IsWhiteSpace(c) || IsSeparator(c) || IsEndOfText(c) || c == '\r' || c == '\n')
+                {
+                    Send(TokenType.Id, textSpan.Slice(start, offset - start));
+                    return offset-start;
+                }
                 ++offset;
             }
 
-            if (start > 0)
+            return Inconslusive;
+        }
+
+        private int TryParseFloat(in ReadOnlySpan<char> textSpan, int offset)
+        {
+            var start = offset;
+
+            if (textSpan[offset] == '+' || textSpan[offset] == '-')
             {
-                Send(TokenType.Id, textSpan.Slice(0, offset));
-                return start;
+                ++offset;
+            }
+
+            if (offset >= textSpan.Length) return Inconslusive;
+
+            bool hasInt = false;
+            while (offset < textSpan.Length && char.IsDigit(textSpan[offset]))
+            {
+                hasInt = true;
+                ++offset;
+            }
+
+            if (offset >= textSpan.Length) return Inconslusive;
+
+            bool hasDot = false;
+            bool hasExp = false;
+            if (textSpan[offset] == '.')
+            {
+                hasDot = true;
+                ++offset;
+                if (offset >= textSpan.Length) return Inconslusive;
+                if (!hasInt && !char.IsDigit(textSpan[offset]))
+                {
+                    return Mismatch;
+                }
+                while (offset < textSpan.Length && char.IsDigit(textSpan[offset]))
+                {
+                    ++offset;
+                }
+            }
+            if (offset >= textSpan.Length) return Inconslusive;
+            if (textSpan[offset] == 'e' || textSpan[offset] == 'E')
+            {
+                ++offset;
+                if (offset >= textSpan.Length) return Inconslusive;
+                if (textSpan[offset] == '+' || textSpan[offset] == '-')
+                {
+                    ++offset;
+                }
+                if (offset >= textSpan.Length) return Inconslusive;
+                if (!char.IsDigit(textSpan[offset]))
+                    return Mismatch;
+                while (offset < textSpan.Length && char.IsDigit(textSpan[offset]))
+                {
+                    hasExp = true;
+                    ++offset;
+                }
+            }
+            if (offset >= textSpan.Length) return Inconslusive;
+
+            if ((hasInt && hasExp) || hasDot)
+            {
+                Send(TokenType.Float, textSpan.Slice(start, offset - start));
+                return offset - start;
+            }
+            if (hasInt && !hasExp && !hasDot)
+            {
+                Send(TokenType.Int, textSpan.Slice(start, offset - start));
+                return offset - start;
             }
 
             return Mismatch;
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsEndOfText(char c)
+        {
+            return c == 3;
         }
 
         private int TryParseNewLine(in ReadOnlySpan<char> textSpan, int offset)

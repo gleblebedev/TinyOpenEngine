@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
@@ -52,8 +53,33 @@ namespace Toe.ContentPipeline.Tokenizer.UnitTests
         [TestCase("+", SimpleTokenizer.TokenType.Separator)]
         [TestCase("-", SimpleTokenizer.TokenType.Separator)]
         [TestCase(".", SimpleTokenizer.TokenType.Separator)]
+        [TestCase("0", SimpleTokenizer.TokenType.Int)]
+        [TestCase("+10", SimpleTokenizer.TokenType.Int)]
+        [TestCase("-10", SimpleTokenizer.TokenType.Int)]
+        [TestCase("2147483647", SimpleTokenizer.TokenType.Int)]
+        [TestCase("-2147483648", SimpleTokenizer.TokenType.Int)]
+        [TestCase("9223372036854775807", SimpleTokenizer.TokenType.Int)]
+        [TestCase("-9223372036854775808", SimpleTokenizer.TokenType.Int)]
+        [TestCase(".5", SimpleTokenizer.TokenType.Float)]
+        [TestCase("+.5", SimpleTokenizer.TokenType.Float)]
+        [TestCase("-.5", SimpleTokenizer.TokenType.Float)]
+        [TestCase("5.", SimpleTokenizer.TokenType.Float)]
+        [TestCase("+5.", SimpleTokenizer.TokenType.Float)]
+        [TestCase("-5.", SimpleTokenizer.TokenType.Float)]
+        [TestCase("1e-2", SimpleTokenizer.TokenType.Float)]
+        [TestCase("+1e-2", SimpleTokenizer.TokenType.Float)]
+        [TestCase("-1e-2", SimpleTokenizer.TokenType.Float)]
+        [TestCase("1.3e-2", SimpleTokenizer.TokenType.Float)]
+        [TestCase("+1.3e-2", SimpleTokenizer.TokenType.Float)]
+        [TestCase("-1.3e-2", SimpleTokenizer.TokenType.Float)]
+        [TestCase("3.40282347E+38", SimpleTokenizer.TokenType.Float)]
+        [TestCase("-3.40282347E+38", SimpleTokenizer.TokenType.Float)]
+        [TestCase("340282346638528859811704183484516925440.00", SimpleTokenizer.TokenType.Float)]
+        [TestCase("-340282346638528859811704183484516925440.00", SimpleTokenizer.TokenType.Float)]
         public void OnNext_CorrectlyParsed(string text, SimpleTokenizer.TokenType type)
         {
+            Console.WriteLine(float.MinValue.ToString("f", CultureInfo.InvariantCulture));
+            Console.WriteLine(float.MaxValue.ToString("f", CultureInfo.InvariantCulture));
             var buf = Encoding.UTF8.GetBytes(text);
             for (var i = 0; i < text.Length; ++i)
             {
