@@ -29,7 +29,7 @@ namespace Toe.ContentPipeline
         void AddDefault(int count = 1);
 
 
-        IList<TValue> GetReader<TValue>();
+        IReadOnlyList<TValue> GetReader<TValue>();
 
         /// <summary>
         ///     Compare to items in stream.

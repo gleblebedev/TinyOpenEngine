@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Toe.ContentPipeline.Preview;
+using Toe.VeldridRender;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;

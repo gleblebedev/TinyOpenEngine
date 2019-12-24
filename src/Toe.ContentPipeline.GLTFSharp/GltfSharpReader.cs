@@ -407,7 +407,7 @@ namespace Toe.ContentPipeline.GLTFSharp
                 nodeAsset.Mesh = new MeshInstance(context.Meshes[node.Mesh.LogicalIndex],
                     node.Mesh.Primitives.Select(_ => context.Materials[_.Material.LogicalIndex]).ToList());
             if (node.Camera != null) nodeAsset.Camera = context.Cameras[node.Camera.LogicalIndex];
-            if (node.PunctualLight != null) nodeAsset.Light = context.Cameras[node.PunctualLight.LogicalIndex];
+            if (node.PunctualLight != null) nodeAsset.Light = context.Lights[node.PunctualLight.LogicalIndex];
             return nodeAsset;
         }
     }

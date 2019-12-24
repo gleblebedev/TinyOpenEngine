@@ -9,5 +9,8 @@ namespace Toe.ContentPipeline
         INodeAsset Parent { get; set; }
 
         IMeshInstance Mesh { get; set; }
+
+        ICameraAsset Camera { get; set; }
+        ILightAsset Light { get; set; }
     }
 }

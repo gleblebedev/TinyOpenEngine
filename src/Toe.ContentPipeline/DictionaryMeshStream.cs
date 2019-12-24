@@ -236,7 +236,7 @@ namespace Toe.ContentPipeline
             AddRange(Enumerable.Range(0, count).Select(_ => default(Value)));
         }
 
-        public IList<TValue> GetReader<TValue>()
+        public IReadOnlyList<TValue> GetReader<TValue>()
         {
             if (typeof(TValue) == typeof(Value))
                 return (StreamConverter<TValue>) (object) new StreamConverterListAdapter<Value>(dataList);
@@ -476,7 +476,7 @@ namespace Toe.ContentPipeline
             AddRange(Enumerable.Range(0, count).Select(_ => default(T)));
         }
 
-        public IList<TValue> GetReader<TValue>()
+        public IReadOnlyList<TValue> GetReader<TValue>()
         {
             if (typeof(TValue) == typeof(T))
                 return (StreamConverter<TValue>) (object) new StreamConverterListAdapter<T>(dataList);

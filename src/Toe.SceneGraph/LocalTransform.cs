@@ -124,5 +124,20 @@ namespace Toe.SceneGraph
             InvalidMatrix = 1,
             InvalidPRS = 2
         }
+
+        public void CopyFrom(LocalTransform other)
+        {
+            _flags = other._flags;
+            if (0 == (_flags & Flags.InvalidMatrix))
+            {
+                _matrix = other._matrix;
+            }
+            if (0 == (_flags & Flags.InvalidPRS))
+            {
+                _position = other._position;
+                _rotation = other._rotation;
+                _scale = other._scale;
+            }
+        }
     }
 }

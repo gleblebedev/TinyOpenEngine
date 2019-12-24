@@ -415,7 +415,7 @@ namespace Toe.ContentPipeline.GLTFSharp
 
         internal abstract class Source<T> : Source
         {
-            protected readonly IList<T> _data;
+            protected readonly IReadOnlyList<T> _data;
             protected int _index;
 
             public Source(IMeshStream data)

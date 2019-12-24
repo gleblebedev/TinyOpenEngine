@@ -1,6 +1,8 @@
-﻿namespace Toe.EntityComponentSystem
+﻿using System;
+
+namespace Toe.EntityComponentSystem
 {
-    public interface ISystem
+    public interface ISystem: IDisposable
     {
     }
 }

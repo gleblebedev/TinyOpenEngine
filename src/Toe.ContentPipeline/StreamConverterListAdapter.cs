@@ -4,9 +4,9 @@ namespace Toe.ContentPipeline
 {
     public class StreamConverterListAdapter<T> : StreamConverter<T>
     {
-        private readonly List<T> list;
+        private readonly IList<T> list;
 
-        public StreamConverterListAdapter(List<T> list)
+        public StreamConverterListAdapter(IList<T> list)
         {
             this.list = list;
         }
@@ -18,11 +18,6 @@ namespace Toe.ContentPipeline
         {
             get => list[index];
             set => list[index] = value;
-        }
-
-        public override void CopyTo(T[] array, int arrayIndex)
-        {
-            list.CopyTo(array, arrayIndex);
         }
     }
 }

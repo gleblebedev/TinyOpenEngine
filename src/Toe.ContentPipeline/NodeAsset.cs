@@ -27,7 +27,7 @@ namespace Toe.ContentPipeline
         }
 
         public ICameraAsset Camera { get; set; }
-        public ICameraAsset Light { get; set; }
+        public ILightAsset Light { get; set; }
 
         public IReadOnlyCollection<INodeAsset> ChildNodes { get; private set; }
 

@@ -8,6 +8,89 @@ namespace Toe.ContentPipeline
 {
     public static class ExtensionMethods
     {
+        public static IReadOnlyList<T> GetStreamReader<T>(this IBufferView bufferView, StreamKey streamKey)
+        {
+            var stream = bufferView.GetStream(streamKey);
+            if (stream == null)
+                return null;
+            return stream.GetReader<T>();
+        }
+
+        public static IEnumerable<(int,int,int)> GetFaces(this IMeshPrimitive source, StreamKey key)
+        {
+            return source.GetIndexReader(key).GetFaces(source.Topology);
+        }
+        public static IEnumerable<(int, int, int)> GetFaces(this IEnumerable<int> source, PrimitiveTopology type)
+        {
+            using (var enumerator = source.GetEnumerator())
+            {
+                switch (type)
+                {
+                    case PrimitiveTopology.TriangleList:
+                        for (; ; )
+                        {
+                            if (!enumerator.MoveNext())
+                            {
+                                yield break;
+                            }
+                            var a = enumerator.Current;
+                            if (!enumerator.MoveNext())
+                            {
+                                yield break;
+                            }
+                            var b = enumerator.Current;
+                            if (!enumerator.MoveNext())
+                            {
+                                yield break;
+                            }
+                            var c = enumerator.Current;
+                            yield return (a, b, c);
+                        }
+                    case PrimitiveTopology.TriangleStrip:
+                        {
+                            if (!enumerator.MoveNext())
+                            {
+                                yield break;
+                            }
+                            var a = enumerator.Current;
+                            if (!enumerator.MoveNext())
+                            {
+                                yield break;
+                            }
+                            var b = enumerator.Current;
+                            if (!enumerator.MoveNext())
+                            {
+                                yield break;
+                            }
+                            var c = enumerator.Current;
+                            for (; ; )
+                            {
+                                if (a != b && b != c && c != a)
+                                {
+                                    yield return (a, b, c);
+                                }
+                                if (!enumerator.MoveNext())
+                                {
+                                    yield break;
+                                }
+                                a = b;
+                                b = c;
+                                c = enumerator.Current;
+                            }
+                        }
+                    case PrimitiveTopology.LineList:
+                        yield break;
+                    case PrimitiveTopology.LineStrip:
+                        yield break;
+                    case PrimitiveTopology.PointList:
+                        yield break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+        }
+
+
         public static IShaderParameter<T> AsShaderParameter<T>(this T value, string key) where T : struct
         {
             return new ShaderParameter<T>(key, value);
@@ -56,6 +139,11 @@ namespace Toe.ContentPipeline
             }
         }
 
+        public static IReadOnlyList<T> AddRange<T>(this IAssetContainer<T> container, IReadOnlyList<T> assets) where T : class, IAsset
+        {
+            return AddRange<T, T>(container, assets, _ => _.Id, (a,id) => a);
+        }
+
         public static IReadOnlyList<T> AddRange<A, T>(this IAssetContainer<T> container, IReadOnlyList<A> assets,
             Func<A, string> getId, Func<A, string, T> transform) where T : class, IAsset
         {
@@ -82,6 +170,7 @@ namespace Toe.ContentPipeline
             var offset = container.Count;
             var lastKnownAvailableIndex = -1;
             for (var index = 0; index < res.Length; ++index)
+            {
                 if (res[index] != null)
                 {
                     container.Add(res[index]);
@@ -105,6 +194,7 @@ namespace Toe.ContentPipeline
                     container.Add(asset);
                     res[index] = asset;
                 }
+            }
 
             return res;
         }

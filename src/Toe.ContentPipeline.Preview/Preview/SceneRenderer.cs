@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using Toe.ContentPipeline.VeldridMesh;
+using Toe.SceneGraph;
+using Toe.VeldridRender;
 using Veldrid;
 
 namespace Toe.ContentPipeline.Preview
@@ -11,8 +15,8 @@ namespace Toe.ContentPipeline.Preview
         private readonly ISceneAsset _scene;
         private VeldridContext _veldrid;
         private CommandList _cl;
-
         private Dictionary<IImageAsset, Texture> _textures = new Dictionary<IImageAsset, Texture>();
+        private Dictionary<IMesh, VeldridGeometry> _meshes = new Dictionary<IMesh, VeldridGeometry>();
 
         public SceneRenderer(IApplicationWindow window, IContentContainer content, ISceneAsset scene = null)
         {
@@ -34,7 +38,7 @@ namespace Toe.ContentPipeline.Preview
         private void OnGraphicsDeviceCreated(VeldridContext veldrid)
         {
             _veldrid = veldrid;
-            _cl = _veldrid.Resources.CreateCommandList();
+            _cl = _veldrid.ResourceFactory.CreateCommandList();
 
             foreach (var contentImage in _content.Images)
             {
@@ -52,32 +56,31 @@ namespace Toe.ContentPipeline.Preview
 
         private void CreateNode(INodeAsset parentNode, INodeAsset node)
         {
-            
         }
 
         private void CreateMesh(IMesh mesh)
         {
-            var gpuMesh = mesh.ToGpuMesh();
-            var bufferViews = new Dictionary<IBufferView, object>();
-            foreach (var bufferView in mesh.BufferViews)
-            {
-                bufferViews.Add(bufferView, null);
-            }
+            _meshes.Add(mesh, VeldridGeometry.Create(mesh));
         }
 
         private void CreateTexture(IImageAsset imageAsset)
         {
             var image = new Veldrid.ImageSharp.ImageSharpTexture(imageAsset.OpenAsync().Result);
-            var texture = image.CreateDeviceTexture(_veldrid.Graphics, _veldrid.Resources);
+            var texture = image.CreateDeviceTexture(_veldrid.GraphicsDevice, _veldrid.ResourceFactory);
             _textures[imageAsset] = texture;
         }
 
         private void Draw(float deltaSeconds)
         {
+            VeldridGeometry mesh = new VeldridGeometry();
+   
             _cl.Begin();
             _cl.SetFramebuffer(MainSwapchain.Framebuffer);
             _cl.ClearColorTarget(0, RgbaFloat.LightGrey);
             _cl.ClearDepthStencil(1f);
+
+
+
             _cl.End();
             GraphicsDevice.SubmitCommands(_cl);
             GraphicsDevice.SwapBuffers(MainSwapchain);
@@ -85,7 +88,7 @@ namespace Toe.ContentPipeline.Preview
         }
         GraphicsDevice GraphicsDevice
         {
-            get { return _veldrid.Graphics; }
+            get { return _veldrid.GraphicsDevice; }
         }
         Swapchain MainSwapchain
         {

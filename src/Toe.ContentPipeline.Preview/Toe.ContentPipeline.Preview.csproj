@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Toe.ContentPipeline</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,9 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Toe.ContentPipeline.VeldridMesh\Toe.ContentPipeline.VeldridMesh.csproj" />
     <ProjectReference Include="..\Toe.ContentPipeline\Toe.ContentPipeline.csproj" />
     <ProjectReference Include="..\Toe.Math\Toe.Math.csproj" />
     <ProjectReference Include="..\Toe.SceneGraph\Toe.SceneGraph.csproj" />
+    <ProjectReference Include="..\Toe.VeldridRender\Toe.VeldridRender.csproj" />
   </ItemGroup>
 
 </Project>
