@@ -33,6 +33,11 @@ namespace Toe.ContentPipeline
             _indices = indices;
         }
 
+        public override IReadOnlyList<int> GetIndexReader(StreamKey key)
+        {
+            return _indices;
+        }
+
         public IEnumerator<int> GetEnumerator()
         {
             return _indices.GetEnumerator();
@@ -46,9 +51,5 @@ namespace Toe.ContentPipeline
         public int Count => _indices.Count;
 
         public int this[int index] => _indices[index];
-        public override IReadOnlyList<int> GetIndexReader(StreamKey key)
-        {
-            return _indices;
-        }
     }
 }

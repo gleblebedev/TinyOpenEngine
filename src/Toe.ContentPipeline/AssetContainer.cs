@@ -48,7 +48,7 @@ namespace Toe.ContentPipeline
         {
             return ((IEnumerable) _list).GetEnumerator();
         }
-        
+
         public bool ContainsKey(string key)
         {
             return _map.ContainsKey(key);

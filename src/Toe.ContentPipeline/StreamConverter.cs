@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
 namespace Toe.ContentPipeline
@@ -24,6 +23,34 @@ namespace Toe.ContentPipeline
         ///     <see cref="T:System.Collections.Generic.IList`1" /> is read-only.
         /// </exception>
         public abstract TRes this[int index] { get; set; }
+
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.
+        /// </summary>
+        /// <returns>
+        ///     The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.
+        /// </returns>
+        public abstract int Count { get; }
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        ///     Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.
+        /// </returns>
+        /// <filterpriority>1</filterpriority>
+        public Enumerator GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
 
         #endregion
 
@@ -78,34 +105,6 @@ namespace Toe.ContentPipeline
 
             #endregion
         }
-
-        #region Public Properties
-
-        /// <summary>
-        ///     Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.
-        /// </summary>
-        /// <returns>
-        ///     The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.
-        /// </returns>
-        public abstract int Count { get; }
-
-        #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>
-        ///     Returns an enumerator that iterates through the collection.
-        /// </summary>
-        /// <returns>
-        ///     A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.
-        /// </returns>
-        /// <filterpriority>1</filterpriority>
-        public Enumerator GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
-
-        #endregion
 
         #region Explicit Interface Methods
 

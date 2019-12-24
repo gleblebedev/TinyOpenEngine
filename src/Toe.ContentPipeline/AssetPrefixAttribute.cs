@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Reflection;
 
 namespace Toe.ContentPipeline
 {
-    public class AssetPrefixAttribute:Attribute
+    public class AssetPrefixAttribute : Attribute
     {
-        private readonly string _prefix;
-
         public AssetPrefixAttribute(string prefix)
         {
-            _prefix = prefix;
+            Prefix = prefix;
         }
 
-        public string Prefix
-        {
-            get => _prefix;
-        }
+        public string Prefix { get; }
 
         public static string Get(Type type)
         {

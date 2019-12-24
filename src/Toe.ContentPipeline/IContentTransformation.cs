@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace Toe.ContentPipeline
+﻿namespace Toe.ContentPipeline
 {
     public interface IContentTransformation
     {

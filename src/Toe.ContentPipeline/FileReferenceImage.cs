@@ -7,7 +7,7 @@ namespace Toe.ContentPipeline
     {
         protected override ValueTask<Stream> GetStreamAsync()
         {
-            return new ValueTask<Stream>((Stream) File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            return new ValueTask<Stream>(File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
         }
     }
 }

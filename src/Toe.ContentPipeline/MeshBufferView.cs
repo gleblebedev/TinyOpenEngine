@@ -37,6 +37,5 @@ namespace Toe.ContentPipeline
         {
             return _availableStreams.Remove(key);
         }
-
     }
 }

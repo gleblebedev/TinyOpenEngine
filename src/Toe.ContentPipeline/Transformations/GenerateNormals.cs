@@ -8,22 +8,23 @@ namespace Toe.ContentPipeline.Transformations
     {
         public IEnumerable<IMesh> Apply(IMesh mesh)
         {
-            if (mesh.BufferViews.All(_=>_.GetStream(StreamKey.Normal) != null))
+            if (mesh.BufferViews.All(_ => _.GetStream(StreamKey.Normal) != null))
             {
                 yield return mesh;
                 yield break;
             }
+
             IndexedMesh indexedMesh;
-            indexedMesh = (mesh as IndexedMesh) ?? mesh.ToIndexedMesh();
+            indexedMesh = mesh as IndexedMesh ?? mesh.ToIndexedMesh();
             EvaluateNormals(indexedMesh);
             yield return indexedMesh;
         }
 
         private void EvaluateNormals(IndexedMesh indexedMesh)
         {
-            foreach (var bufferAndPrimitives in indexedMesh.Primitives.ToLookup(_=>_.BufferView))
+            foreach (var bufferAndPrimitives in indexedMesh.GroupPrimitives())
             {
-                var bufferView = bufferAndPrimitives.Key;
+                var bufferView = bufferAndPrimitives.BufferView;
                 var existingNormals = bufferView.GetStream(StreamKey.Normal);
                 if (existingNormals != null)
                     continue;
@@ -31,9 +32,7 @@ namespace Toe.ContentPipeline.Transformations
                 var positions = bufferView.GetStreamReader<Vector3>(StreamKey.Position);
                 var normals = new ArrayMeshStream<Vector3>(positions.Count, StreamConverterFactory.Default);
                 foreach (var primitive in bufferAndPrimitives)
-                {
                     primitive.SetIndexStream(StreamKey.Normal, primitive.GetIndexReader(StreamKey.Position).ToList());
-                }
                 {
                     foreach (var face in indexedMesh.Primitives.SelectMany(_ => _.GetFaces(StreamKey.Position)))
                     {
@@ -45,20 +44,19 @@ namespace Toe.ContentPipeline.Transformations
                         normals[face.Item2] += n;
                         normals[face.Item3] += n;
                     }
+
                     for (var index = 0; index < normals.Count; index++)
                     {
                         var normal = normals[index];
                         if (normal != Vector3.Zero)
                             normals[index] = Vector3.Normalize(normal);
                     }
+
                     bufferView.SetStream(StreamKey.Normal, normals);
                 }
                 foreach (var primitive in bufferAndPrimitives)
-                {
                     primitive.SetIndexStream(StreamKey.Normal, primitive.GetIndexReader(StreamKey.Position).ToList());
-                }
             }
-     
         }
     }
 }
