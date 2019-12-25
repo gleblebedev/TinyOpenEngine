@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Toe.ContentPipeline
 {
@@ -22,99 +24,60 @@ namespace Toe.ContentPipeline
             var resultPrimitives = new GpuPrimitive[optimalIndexedMesh.Primitives.Count];
             var result = new GpuMesh(source.Id);
 
+            var indices = new List<int>();
             foreach (var primitiveGroup in optimalIndexedMesh.GroupPrimitives())
             {
                 var sourceBuffer = primitiveGroup.BufferView;
+                var gpuBufferView = new MeshBufferView();
+                var streamKeys = sourceBuffer.GetStreams().ToList();
+                var copiers = new AbstractMeshStreamCopier[streamKeys.Count];
+                for (var index = 0; index < streamKeys.Count; index++)
+                {
+                    var streamKey = streamKeys[index];
+                    var meshStream = sourceBuffer.GetStream(streamKey);
+                    var destination = meshStream.CreateListMeshStreamOfTheSameType();
+                    gpuBufferView.SetStream(streamKey, destination);
+                    copiers[index] = new BoxingtMeshStreamCopier(meshStream, destination);
+                }
+
+                var expectedCapacityEsitmation = primitiveGroup.Select(_ => _.GetIndexReader(StreamKey.Position).Count).Sum()*streamKeys.Count;
+                indices.Clear();
+                if (indices.Capacity < expectedCapacityEsitmation) indices.Capacity = expectedCapacityEsitmation;
+                Dictionary<IndexSet, int> vertexMap = new Dictionary<IndexSet, int>();
+                foreach (var primitiveAndIndex in primitiveGroup.Primitives)
+                {
+                    var primitive = primitiveAndIndex.Primitive;
+                    var setReader = new IndexSetReader(indices, streamKeys, primitive);
+                    var ints = primitive.GetIndexReader(StreamKey.Position);
+                    var gpuIndices = new List<int>();
+                    for (var index = 0; index < ints.Count; index++)
+                    {
+                        var set = setReader.Read(index);
+                        if (vertexMap.TryGetValue(set, out var vertexIndex))
+                        {
+                            setReader.Position = set.Offset;
+                        }
+                        else
+                        {
+                            for (var streamIndex = 0; streamIndex < streamKeys.Count; streamIndex++)
+                            {
+                                vertexIndex = copiers[streamIndex].Copy(set[streamIndex]);
+                            }
+                            vertexMap.Add(set, vertexIndex);
+                        }
+                        gpuIndices.Add(vertexIndex);
+                    }
+                    var gpuPrimitive = new GpuPrimitive(primitive.Topology, gpuIndices, gpuBufferView);
+                    resultPrimitives[primitiveAndIndex.Index] = gpuPrimitive;
+                }
+
             }
             foreach (var indexMeshPrimitive in resultPrimitives)
             {
                 result.Primitives.Add(indexMeshPrimitive);
             }
 
-            throw new NotImplementedException();
             return result;
-
-            //var streamKeys = VertexBufferFormatItem.ExtractItems(source).ToArray();
-            //var lastItem = streamKeys.LastOrDefault();
-
-            //if (lastItem == null)
-            //{
-            //    return new SingleStreamMesh();
-            //}
-
-            //var streamMetaInfos = streamKeys.Select(x => source.GetStream(x.Key)).ToArray();
-            //var streamReaders = streamKeys.Select(x => source.GetStreamReader<Vector4>(x.Key)).ToArray();
-
-            //var totalComponents = lastItem.Components + lastItem.Offset;
-
-            //var key = new float[totalComponents];
-            //var dstStreams = new List<IMeshStream>();
-            //for (var i = 0; i < streamKeys.Length; ++i)
-            //{
-            //    var meshStream = ListMeshStream.Create(
-            //        streamMetaInfos[i].MetaInfo.BaseType,
-            //        streamMetaInfos[i].ConverterFactory,
-            //        streamMetaInfos[i].MetaInfo);
-            //    dstStreams.Add(meshStream);
-            //    dst.SetStream(streamKeys[i].Key, meshStream);
-            //}
-
-            //var map = new Dictionary<float[], int>(new FloatArrayComparer());
-
-            //foreach (var submesh in source.Submeshes)
-            //{
-            //    var streamIndexReaders = streamKeys.Select(x => submesh.GetIndexReader(x.Key)).ToArray();
-            //    var stream = new List<int>(submesh.Count);
-            //    for (var i = 0; i < submesh.Count; ++i)
-            //    {
-            //        for (var j = 0; j < streamKeys.Length; j++)
-            //        {
-            //            var streamKey = streamKeys[j];
-            //            var streamIndexReader = streamIndexReaders[j][i];
-            //            var f = streamReaders[j][streamIndexReader];
-            //            if (streamKey.Components >= 1)
-            //            {
-            //                key[streamKey.Offset] = f.X;
-            //            }
-            //            if (streamKey.Components >= 2)
-            //            {
-            //                key[streamKey.Offset + 1] = f.Y;
-            //            }
-            //            if (streamKey.Components >= 3)
-            //            {
-            //                key[streamKey.Offset + 2] = f.Z;
-            //            }
-            //            if (streamKey.Components >= 4)
-            //            {
-            //                key[streamKey.Offset + 3] = f.W;
-            //            }
-            //        }
-
-            //        int index;
-            //        if (!map.TryGetValue(key, out index))
-            //        {
-            //            var copy = new float[key.Length];
-            //            key.CopyTo(copy, 0);
-            //            index = map.Count;
-            //            map.Add(copy, index);
-
-            //            for (var j = 0; j < streamKeys.Length; ++j)
-            //            {
-            //                var sourceStream = source.GetStream(streamKeys[j].Key);
-            //                var dstStream = dstStreams[j];
-
-            //                var streamIndexReader = streamIndexReaders[j];
-            //                var value = sourceStream[streamIndexReader[i]];
-            //                dstStream.Add(value);
-            //            }
-            //        }
-            //        stream.Add(index);
-            //    }
-            //    var dstSubMesh = dst.CreateSubmesh(stream, submesh.VertexSourceType);
-            //    dstSubMesh.Material = submesh.Material;
-            //}
-
-            //return dst;
         }
     }
 }

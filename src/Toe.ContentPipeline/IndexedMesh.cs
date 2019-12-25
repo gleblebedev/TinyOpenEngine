@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Toe.ContentPipeline
 {
-    public class MeshWriter
-    {
-        public MeshWriter()
-        {
-            
-        }
-    }
-
     public class IndexedMesh : AbstractMesh<IndexMeshPrimitive>, IMesh
     {
         public IndexedMesh(string id) : base(id)
@@ -39,6 +30,10 @@ namespace Toe.ContentPipeline
                 var streamKeys = bufferView.GetStreams().ToList();
                 var sourceStreams = streamKeys.Select(x => bufferView.GetStream(x)).ToList();
                 var dictionaryStreams = sourceStreams.Select(_ => _.CreateDictionaryMeshStreamOfTheSameType()).ToList();
+                for (var index = 0; index < dictionaryStreams.Count; index++)
+                {
+                    resultBufferView.SetStream(streamKeys[index], dictionaryStreams[index]);
+                }
 
                 foreach (var primitiveAndIndex in primitiveGroup.Primitives)
                 {
