@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 
 namespace Toe.ContentPipeline.Transformations
@@ -13,23 +12,18 @@ namespace Toe.ContentPipeline.Transformations
         {
             _color = color;
         }
-        public GenerateColors():this(Vector4.One)
+
+        public GenerateColors() : this(Vector4.One)
         {
         }
-       
+
         public IEnumerable<IMesh> Apply(IMesh geometry)
         {
             var indexedMesh = geometry as IndexedMesh;
-            if (indexedMesh != null)
-            {
-                return PaintSeparateStreamMesh(indexedMesh);
-            }
+            if (indexedMesh != null) return PaintSeparateStreamMesh(indexedMesh);
 
             var gpuMesh = geometry as GpuMesh;
-            if (gpuMesh != null)
-            {
-                return PaintSingleStreamMesh(gpuMesh);
-            }
+            if (gpuMesh != null) return PaintSingleStreamMesh(gpuMesh);
             return PaintSingleStreamMesh(geometry.ToGpuMesh());
         }
 
@@ -38,10 +32,7 @@ namespace Toe.ContentPipeline.Transformations
             foreach (var bufferAndPrimitives in mesh.GroupPrimitives())
             {
                 var bufferView = bufferAndPrimitives.BufferView;
-                if (bufferView.GetStream(StreamKey.Color) != null)
-                {
-                    continue;
-                }
+                if (bufferView.GetStream(StreamKey.Color) != null) continue;
                 var meshStream = bufferView.GetStream(StreamKey.Position);
                 var streamConverterFactory = meshStream.ConverterFactory;
                 var colors = new Vector4[meshStream.Count];
@@ -49,6 +40,7 @@ namespace Toe.ContentPipeline.Transformations
                 var arrayMeshStream = new ArrayMeshStream<Vector4>(colors, streamConverterFactory);
                 bufferView.SetStream(StreamKey.Color, arrayMeshStream);
             }
+
             yield return mesh;
         }
 
@@ -57,12 +49,10 @@ namespace Toe.ContentPipeline.Transformations
             foreach (var bufferAndPrimitives in mesh.GroupPrimitives())
             {
                 var bufferView = bufferAndPrimitives.BufferView;
-                if (bufferView.GetStream(StreamKey.Color) != null)
-                {
-                    continue;
-                }
+                if (bufferView.GetStream(StreamKey.Color) != null) continue;
                 var streamConverterFactory = bufferView.GetStream(StreamKey.Position).ConverterFactory;
-                bufferView.SetStream(StreamKey.Color, new ArrayMeshStream<Vector4>(new[] { _color }, streamConverterFactory));
+                bufferView.SetStream(StreamKey.Color,
+                    new ArrayMeshStream<Vector4>(new[] {_color}, streamConverterFactory));
                 foreach (var primitiveAndIndex in bufferAndPrimitives.Primitives)
                 {
                     var submesh = primitiveAndIndex.Primitive;
@@ -71,6 +61,7 @@ namespace Toe.ContentPipeline.Transformations
                     submesh.SetIndexStream(StreamKey.Color, indices);
                 }
             }
+
             yield return mesh;
         }
     }

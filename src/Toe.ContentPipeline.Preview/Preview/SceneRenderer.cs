@@ -40,9 +40,13 @@ namespace Toe.ContentPipeline.Preview
             _veldrid = veldrid;
             _cl = _veldrid.ResourceFactory.CreateCommandList();
 
-            foreach (var contentImage in _content.Images)
+            foreach (var imageAsset in _content.Images)
             {
-                CreateTexture(contentImage);
+                CreateTexture(imageAsset);
+            }
+            foreach (var materialAsset in _content.Materials)
+            {
+                CreateMaterial(materialAsset);
             }
             foreach (var mesh in _content.Meshes)
             {
@@ -56,6 +60,7 @@ namespace Toe.ContentPipeline.Preview
 
         private void CreateNode(INodeAsset parentNode, INodeAsset node)
         {
+            
         }
 
         private void CreateMesh(IMesh mesh)
@@ -69,6 +74,11 @@ namespace Toe.ContentPipeline.Preview
             var texture = image.CreateDeviceTexture(_veldrid.GraphicsDevice, _veldrid.ResourceFactory);
             _textures[imageAsset] = texture;
         }
+        private void CreateMaterial(IMaterialAsset materialAsset)
+        {
+            
+        }
+
 
         private void Draw(float deltaSeconds)
         {
@@ -78,8 +88,6 @@ namespace Toe.ContentPipeline.Preview
             _cl.SetFramebuffer(MainSwapchain.Framebuffer);
             _cl.ClearColorTarget(0, RgbaFloat.LightGrey);
             _cl.ClearDepthStencil(1f);
-
-
 
             _cl.End();
             GraphicsDevice.SubmitCommands(_cl);

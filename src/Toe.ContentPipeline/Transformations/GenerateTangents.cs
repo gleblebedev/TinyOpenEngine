@@ -6,7 +6,6 @@ namespace Toe.ContentPipeline.Transformations
 {
     public class GenerateTangents : IMeshTransformation
     {
-
         public IEnumerable<IMesh> Apply(IMesh mesh)
         {
             if (mesh.BufferViews.All(_ => _.GetStream(StreamKey.Tangent) != null))
@@ -25,10 +24,7 @@ namespace Toe.ContentPipeline.Transformations
             foreach (var bufferAndPrimitives in mesh.GroupPrimitives())
             {
                 var bufferView = bufferAndPrimitives.BufferView;
-                if (bufferView.GetStream(StreamKey.TexCoord0) == null)
-                {
-                    continue;
-                }
+                if (bufferView.GetStream(StreamKey.TexCoord0) == null) continue;
 
                 throw new NotImplementedException();
             }

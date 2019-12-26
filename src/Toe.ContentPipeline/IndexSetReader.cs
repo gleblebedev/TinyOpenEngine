@@ -2,17 +2,16 @@
 
 namespace Toe.ContentPipeline
 {
-    internal class IndexSetReader 
+    internal class IndexSetReader
     {
         private readonly List<int> _buffer;
-        private IReadOnlyList<int>[] _readers;
-        private int _position = 0;
+        private readonly IReadOnlyList<int>[] _readers;
 
         public IndexSetReader(List<int> buffer, IReadOnlyCollection<StreamKey> keys, IndexMeshPrimitive primitive)
         {
             _buffer = buffer;
             _readers = new IReadOnlyList<int>[keys.Count];
-            int i = 0;
+            var i = 0;
             foreach (var streamKey in keys)
             {
                 _readers[i] = primitive.GetIndexReader(streamKey);
@@ -20,23 +19,19 @@ namespace Toe.ContentPipeline
             }
         }
 
-        public int Position
-        {
-            get { return _position;}
-            set { _position = value; }
-        }
+        public int Position { get; set; }
 
         public IndexSet Read(int index)
         {
-            var res = new IndexSet(_buffer, _position, _readers.Length);
+            var res = new IndexSet(_buffer, Position, _readers.Length);
 
             foreach (var readOnlyList in _readers)
             {
-                if (_buffer.Count == _position)
+                if (_buffer.Count == Position)
                     _buffer.Add(readOnlyList[index]);
                 else
-                    _buffer[_position] = readOnlyList[index];
-                ++_position;
+                    _buffer[Position] = readOnlyList[index];
+                ++Position;
             }
 
             return res;

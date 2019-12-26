@@ -2,27 +2,19 @@
 {
     public struct PrimitiveAndIndex<T>
     {
-        private readonly T _primitive;
-        private readonly int _index;
-
         public PrimitiveAndIndex(T primitive, int index)
         {
-            _primitive = primitive;
-            _index = index;
+            Primitive = primitive;
+            Index = index;
         }
-        public static implicit operator int (PrimitiveAndIndex<T> primitive)
+
+        public static implicit operator int(PrimitiveAndIndex<T> primitive)
         {
             return primitive.Index;
         }
 
-        public T Primitive
-        {
-            get => _primitive;
-        }
+        public T Primitive { get; }
 
-        public int Index
-        {
-            get => _index;
-        }
+        public int Index { get; }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Common;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,6 +8,127 @@ namespace Toe.ContentPipeline
 {
     public static class ExtensionMethods
     {
+        public static IContentContainer ToContentContainer(this ISceneAsset scene)
+        {
+            var content = new ContentContainer();
+            content.Scenes.Add(scene);
+            var visitedCameras = new HashSet<ICameraAsset>();
+            var visitedLights = new HashSet<ILightAsset>();
+            var visitedMeshes = new HashSet<IMesh>();
+            var visitedMaterials = new HashSet<IMaterialAsset>();
+            var visitedImages = new HashSet<IImageAsset>();
+            foreach (var nodeAsset in scene.EnumerateNodesBreadthFirst())
+            {
+                content.Nodes.Add(nodeAsset);
+                if (nodeAsset.Camera != null)
+                    if (visitedCameras.Add(nodeAsset.Camera))
+                        content.Cameras.Add(nodeAsset.Camera);
+                if (nodeAsset.Light != null)
+                    if (visitedLights.Add(nodeAsset.Light))
+                        content.Lights.Add(nodeAsset.Light);
+                if (nodeAsset.Mesh != null)
+                {
+                    if (nodeAsset.Mesh.Mesh != null)
+                        if (visitedMeshes.Add(nodeAsset.Mesh.Mesh))
+                            content.Meshes.Add(nodeAsset.Mesh.Mesh);
+
+                    if (nodeAsset.Mesh.Materials != null)
+                        foreach (var materialAsset in nodeAsset.Mesh.Materials)
+                            if (visitedMaterials.Add(materialAsset))
+                            {
+                                content.Materials.Add(materialAsset);
+                                if (materialAsset.Shader != null)
+                                    foreach (var parameter in materialAsset.Shader.Parameters)
+                                        if (parameter.ValueType == typeof(SamplerParameters))
+                                        {
+                                            var samper = parameter as IShaderParameter<SamplerParameters>;
+                                            if (samper?.Value.Image != null)
+                                                if (visitedImages.Add(samper.Value.Image))
+                                                    content.Images.Add(samper.Value.Image);
+                                        }
+                            }
+                }
+            }
+
+            return content;
+        }
+
+        /// <summary>
+        ///     Enumerate child nodes "Breadth-First".
+        /// </summary>
+        /// <param name="root">Parent node.</param>
+        /// <returns>Yielded nodes.</returns>
+        public static IEnumerable<INodeAsset> EnumerateNodesBreadthFirst(this INodeContainer root)
+        {
+            if (root == null) yield break;
+            var containers = new Stack<INodeAsset>(16);
+            foreach (var n in root.ChildNodes) containers.Push(n);
+            while (containers.Count > 0)
+            {
+                var node = containers.Pop();
+                yield return node;
+                foreach (var n in node.ChildNodes) containers.Push(n);
+            }
+        }
+
+        /// <summary>
+        ///     Enumerate child nodes "Depth-First".
+        /// </summary>
+        /// <param name="root">Parent node.</param>
+        /// <returns>Yielded nodes.</returns>
+        public static IEnumerable<INodeAsset> EnumerateNodesDepthFirst(this INodeContainer root)
+        {
+            if (root == null) yield break;
+            var containers = new Queue<INodeAsset>(16);
+            foreach (var n in root.ChildNodes) containers.Enqueue(n);
+            while (containers.Count > 0)
+            {
+                var node = containers.Dequeue();
+                yield return node;
+                foreach (var n in node.ChildNodes) containers.Enqueue(n);
+            }
+        }
+
+        public static void ForEachStream(this IBufferView bufferView, Action<StreamKey, int, IMeshStream> callback)
+        {
+            var i = 0;
+            var streamKeys = bufferView.GetStreams();
+            foreach (var stream in streamKeys)
+            {
+                callback(stream, i, bufferView.GetStream(stream));
+                ++i;
+            }
+        }
+
+        public static IReadOnlyList<T> ForEachStream<T>(this IBufferView bufferView,
+            Func<StreamKey, int, IMeshStream, T> callback)
+        {
+            var streamKeys = bufferView.GetStreams();
+            var res = new T[streamKeys.Count];
+            var i = 0;
+            foreach (var stream in streamKeys)
+            {
+                res[i] = callback(stream, i, bufferView.GetStream(stream));
+                ++i;
+            }
+
+            return res;
+        }
+
+        public static IReadOnlyList<To> Project<TFrom, To>(this IReadOnlyCollection<TFrom> values,
+            Func<TFrom, int, To> callback)
+        {
+            var res = new To[values.Count];
+            var i = 0;
+            foreach (var stream in values)
+            {
+                res[i] = callback(stream, i);
+                ++i;
+            }
+
+            return res;
+        }
+
         public static IReadOnlyList<T> GetStreamReader<T>(this IBufferView bufferView, StreamKey streamKey)
         {
             var stream = bufferView.GetStream(streamKey);
@@ -189,7 +308,8 @@ namespace Toe.ContentPipeline
             return IndexedMesh.Optimize(source);
         }
 
-        public static IReadOnlyCollection<BufferViewAndPrimitiveIndices<IMeshPrimitive>> GroupPrimitives(this IMesh mesh)
+        public static IReadOnlyCollection<BufferViewAndPrimitiveIndices<IMeshPrimitive>> GroupPrimitives(
+            this IMesh mesh)
         {
             var map = new Dictionary<IBufferView, BufferViewAndPrimitiveIndices<IMeshPrimitive>>(mesh.Primitives.Count);
             for (var index = 0; index < mesh.Primitives.Count; index++)
@@ -197,16 +317,17 @@ namespace Toe.ContentPipeline
                 var meshPrimitive = mesh.Primitives[index];
                 var bufferView = meshPrimitive.BufferView;
                 if (!map.TryGetValue(bufferView, out var indices))
-                {
-                    map.Add(bufferView, indices = new BufferViewAndPrimitiveIndices<IMeshPrimitive>() { BufferView = bufferView});
-                }
+                    map.Add(bufferView,
+                        indices = new BufferViewAndPrimitiveIndices<IMeshPrimitive> {BufferView = bufferView});
 
                 indices.Primitives.Add(new PrimitiveAndIndex<IMeshPrimitive>(meshPrimitive, index));
             }
 
             return map.Values;
         }
-        public static IReadOnlyCollection<BufferViewAndPrimitiveIndices<GpuPrimitive>> GroupPrimitives(this GpuMesh mesh)
+
+        public static IReadOnlyCollection<BufferViewAndPrimitiveIndices<GpuPrimitive>> GroupPrimitives(
+            this GpuMesh mesh)
         {
             var map = new Dictionary<IBufferView, BufferViewAndPrimitiveIndices<GpuPrimitive>>(mesh.Primitives.Count);
             for (var index = 0; index < mesh.Primitives.Count; index++)
@@ -214,26 +335,27 @@ namespace Toe.ContentPipeline
                 var meshPrimitive = mesh.Primitives[index];
                 var bufferView = meshPrimitive.BufferView;
                 if (!map.TryGetValue(bufferView, out var indices))
-                {
-                    map.Add(bufferView, indices = new BufferViewAndPrimitiveIndices<GpuPrimitive>() { BufferView = bufferView });
-                }
+                    map.Add(bufferView,
+                        indices = new BufferViewAndPrimitiveIndices<GpuPrimitive> {BufferView = bufferView});
 
                 indices.Primitives.Add(new PrimitiveAndIndex<GpuPrimitive>(meshPrimitive, index));
             }
 
             return map.Values;
         }
-        public static IReadOnlyCollection<BufferViewAndPrimitiveIndices<IndexMeshPrimitive>> GroupPrimitives(this IndexedMesh mesh)
+
+        public static IReadOnlyCollection<BufferViewAndPrimitiveIndices<IndexMeshPrimitive>> GroupPrimitives(
+            this IndexedMesh mesh)
         {
-            var map = new Dictionary<IBufferView, BufferViewAndPrimitiveIndices<IndexMeshPrimitive>>(mesh.Primitives.Count);
+            var map =
+                new Dictionary<IBufferView, BufferViewAndPrimitiveIndices<IndexMeshPrimitive>>(mesh.Primitives.Count);
             for (var index = 0; index < mesh.Primitives.Count; index++)
             {
                 var meshPrimitive = mesh.Primitives[index];
                 var bufferView = meshPrimitive.BufferView;
                 if (!map.TryGetValue(bufferView, out var indices))
-                {
-                    map.Add(bufferView, indices = new BufferViewAndPrimitiveIndices<IndexMeshPrimitive>() { BufferView = bufferView });
-                }
+                    map.Add(bufferView,
+                        indices = new BufferViewAndPrimitiveIndices<IndexMeshPrimitive> {BufferView = bufferView});
 
                 indices.Primitives.Add(new PrimitiveAndIndex<IndexMeshPrimitive>(meshPrimitive, index));
             }

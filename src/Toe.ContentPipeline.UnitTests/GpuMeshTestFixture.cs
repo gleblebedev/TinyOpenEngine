@@ -51,17 +51,13 @@ namespace Toe.ContentPipeline
             builder.BeginBuffer();
             builder.BeginPrimitive(PrimitiveTopology.TriangleList);
             builder.Color(Vector4.Zero);
-            builder.Position(new Vector3(0, 0, 0));
-            builder.Color(Vector4.Zero);
-            builder.Position(new Vector3(1, 0, 0));
-            builder.Color(Vector4.Zero);
-            builder.Position(new Vector3(0, 1, 0));
+            builder.Vertex(new Vector3(0, 0, 0));
+            builder.Vertex(new Vector3(1, 0, 0));
+            builder.Vertex(new Vector3(0, 1, 0));
             builder.Color(Vector4.One);
-            builder.Position(new Vector3(1, 0, 0));
-            builder.Color(Vector4.One);
-            builder.Position(new Vector3(1, 1, 0));
-            builder.Color(Vector4.One);
-            builder.Position(new Vector3(0, 1, 0));
+            builder.Vertex(new Vector3(1, 0, 0));
+            builder.Vertex(new Vector3(1, 1, 0));
+            builder.Vertex(new Vector3(0, 1, 0));
 
             var mesh = GpuMesh.Optimize(builder.Complete());
 

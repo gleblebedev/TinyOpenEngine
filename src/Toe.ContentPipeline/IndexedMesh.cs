@@ -9,7 +9,7 @@ namespace Toe.ContentPipeline
         {
         }
 
-        public IndexedMesh() : base()
+        public IndexedMesh()
         {
         }
 
@@ -25,15 +25,13 @@ namespace Toe.ContentPipeline
             foreach (var primitiveGroup in primitiveGroups)
             {
                 var resultBufferView = new MeshBufferView();
-       
+
                 var bufferView = primitiveGroup.BufferView;
                 var streamKeys = bufferView.GetStreams().ToList();
                 var sourceStreams = streamKeys.Select(x => bufferView.GetStream(x)).ToList();
                 var dictionaryStreams = sourceStreams.Select(_ => _.CreateDictionaryMeshStreamOfTheSameType()).ToList();
                 for (var index = 0; index < dictionaryStreams.Count; index++)
-                {
                     resultBufferView.SetStream(streamKeys[index], dictionaryStreams[index]);
-                }
 
                 foreach (var primitiveAndIndex in primitiveGroup.Primitives)
                 {
@@ -50,22 +48,16 @@ namespace Toe.ContentPipeline
                         var sourceStream = sourceStreams[keyIndex];
                         var stream = new List<int>(sourceIndices.Count);
                         for (var i = 0; i < sourceIndices.Count; ++i)
-                        {
                             stream.Add(dataStream.Add(sourceStream[sourceIndices[i]]));
-                        }
                         meshPrimitive.SetIndexStream(key, stream);
                     }
                 }
+
                 for (var keyIndex = 0; keyIndex < streamKeys.Count; ++keyIndex)
-                {
                     bufferView.SetStream(streamKeys[keyIndex], dictionaryStreams[keyIndex]);
-                }
             }
 
-            foreach (var indexMeshPrimitive in resultPrimitives)
-            {
-                result.Primitives.Add(indexMeshPrimitive);
-            }
+            foreach (var indexMeshPrimitive in resultPrimitives) result.Primitives.Add(indexMeshPrimitive);
             return result;
         }
     }

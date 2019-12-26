@@ -2,7 +2,8 @@
 
 namespace Toe.ContentPipeline.Collada
 {
-    public class DaeFileFormat : IFileFormat
+    public class DaeFileFormat : AbstractFileFormat, IFileFormat
     {
+        public override string Name => "Dae";
     }
 }

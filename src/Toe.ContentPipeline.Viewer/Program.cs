@@ -16,7 +16,7 @@ namespace Toe.ContentPipeline.Viewer
                 throw new FileNotFoundException("File not found "+options.Value.FileName, options.Value.FileName);
             }
 
-            VeldridStartupWindow window = new VeldridStartupWindow("glTF Viewer", options?.Value ?? new ViewerOptions());
+            VeldridStartupWindow window = new VeldridStartupWindow("Model Viewer", options?.Value ?? new ViewerOptions());
 
             SceneRenderer sceneRenderer = new SceneRenderer(window, new Toe.ContentPipeline.GLTFSharp.GltfSharpReader().Load(options.Value.FileName));
             window.Run();

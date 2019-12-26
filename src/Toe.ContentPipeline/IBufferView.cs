@@ -4,7 +4,7 @@ namespace Toe.ContentPipeline
 {
     public interface IBufferView
     {
-        IEnumerable<StreamKey> GetStreams();
+        IReadOnlyCollection<StreamKey> GetStreams();
 
         bool HasStream(StreamKey key);
 

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 
 namespace Toe.ContentPipeline.Transformations
 {
     public class GenerateBitangents : IMeshTransformation
     {
-
         public IEnumerable<IMesh> Apply(IMesh mesh)
         {
             if (mesh.BufferViews.All(_ => _.GetStream(StreamKey.Binormal) != null))
@@ -26,10 +24,7 @@ namespace Toe.ContentPipeline.Transformations
             foreach (var bufferAndPrimitives in mesh.GroupPrimitives())
             {
                 var bufferView = bufferAndPrimitives.BufferView;
-                if (bufferView.GetStream(StreamKey.TexCoord0) == null)
-                {
-                    continue;
-                }
+                if (bufferView.GetStream(StreamKey.TexCoord0) == null) continue;
                 throw new NotImplementedException();
             }
             //var tangents = new ArrayMeshStream<Vector3>(mesh.Count, mesh.GetStream(StreamKey.Position).ConverterFactory);

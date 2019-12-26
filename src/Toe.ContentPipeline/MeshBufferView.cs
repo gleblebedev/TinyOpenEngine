@@ -15,7 +15,7 @@ namespace Toe.ContentPipeline
             return null;
         }
 
-        public IEnumerable<StreamKey> GetStreams()
+        public IReadOnlyCollection<StreamKey> GetStreams()
         {
             return _availableStreams.Keys;
         }

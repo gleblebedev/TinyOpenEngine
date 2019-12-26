@@ -11,10 +11,8 @@ namespace Toe.ContentPipeline
             if (_count != other._count)
                 return false;
             for (var i = 0; i < _count; i++)
-            {
                 if (this[i] != other[i])
                     return false;
-            }
 
             return true;
         }
@@ -22,9 +20,9 @@ namespace Toe.ContentPipeline
         public int this[int streamIndex]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return _indices[_start+streamIndex]; }
+            get => _indices[Offset + streamIndex];
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set { _indices[_start + streamIndex] = value; }
+            set => _indices[Offset + streamIndex] = value;
         }
 
         public override bool Equals(object obj)
@@ -37,10 +35,7 @@ namespace Toe.ContentPipeline
             unchecked
             {
                 var hashCode = 0;
-                for (var i = 0; i < _count; i++)
-                {
-                    hashCode = (hashCode * 397) ^ this[i];
-                }
+                for (var i = 0; i < _count; i++) hashCode = (hashCode * 397) ^ this[i];
                 return hashCode;
             }
         }
@@ -56,19 +51,15 @@ namespace Toe.ContentPipeline
         }
 
         private readonly List<int> _indices;
-        private readonly int _start;
         private readonly int _count;
 
         public IndexSet(List<int> indices, int start, int count)
         {
             _indices = indices;
-            _start = start;
+            Offset = start;
             _count = count;
         }
 
-        public int Offset
-        {
-            get { return _start; }
-        }
+        public int Offset { get; }
     }
 }

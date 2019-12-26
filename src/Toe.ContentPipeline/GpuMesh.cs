@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Toe.ContentPipeline
 {
@@ -29,21 +27,20 @@ namespace Toe.ContentPipeline
             {
                 var sourceBuffer = primitiveGroup.BufferView;
                 var gpuBufferView = new MeshBufferView();
-                var streamKeys = sourceBuffer.GetStreams().ToList();
-                var copiers = new AbstractMeshStreamCopier[streamKeys.Count];
-                for (var index = 0; index < streamKeys.Count; index++)
+                var streamKeys = sourceBuffer.GetStreams();
+                var copiers = streamKeys.Project((streamKey, streamIndex) =>
                 {
-                    var streamKey = streamKeys[index];
                     var meshStream = sourceBuffer.GetStream(streamKey);
                     var destination = meshStream.CreateListMeshStreamOfTheSameType();
                     gpuBufferView.SetStream(streamKey, destination);
-                    copiers[index] = new BoxingtMeshStreamCopier(meshStream, destination);
-                }
+                    return new BoxingtMeshStreamCopier(meshStream, destination);
+                });
 
-                var expectedCapacityEsitmation = primitiveGroup.Select(_ => _.GetIndexReader(StreamKey.Position).Count).Sum()*streamKeys.Count;
+                var expectedCapacityEsitmation =
+                    primitiveGroup.Select(_ => _.GetIndexReader(StreamKey.Position).Count).Sum() * streamKeys.Count;
                 indices.Clear();
                 if (indices.Capacity < expectedCapacityEsitmation) indices.Capacity = expectedCapacityEsitmation;
-                Dictionary<IndexSet, int> vertexMap = new Dictionary<IndexSet, int>();
+                var vertexMap = new Dictionary<IndexSet, int>();
                 foreach (var primitiveAndIndex in primitiveGroup.Primitives)
                 {
                     var primitive = primitiveAndIndex.Primitive;
@@ -60,22 +57,19 @@ namespace Toe.ContentPipeline
                         else
                         {
                             for (var streamIndex = 0; streamIndex < streamKeys.Count; streamIndex++)
-                            {
                                 vertexIndex = copiers[streamIndex].Copy(set[streamIndex]);
-                            }
                             vertexMap.Add(set, vertexIndex);
                         }
+
                         gpuIndices.Add(vertexIndex);
                     }
+
                     var gpuPrimitive = new GpuPrimitive(primitive.Topology, gpuIndices, gpuBufferView);
                     resultPrimitives[primitiveAndIndex.Index] = gpuPrimitive;
                 }
+            }
 
-            }
-            foreach (var indexMeshPrimitive in resultPrimitives)
-            {
-                result.Primitives.Add(indexMeshPrimitive);
-            }
+            foreach (var indexMeshPrimitive in resultPrimitives) result.Primitives.Add(indexMeshPrimitive);
 
             return result;
         }

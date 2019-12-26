@@ -2,7 +2,8 @@
 
 namespace Toe.ContentPipeline.Ase
 {
-    public class AseFileFormat : IFileFormat
+    public class AseFileFormat : AbstractFileFormat, IFileFormat
     {
+        public override string Name => "Ase";
     }
 }

@@ -18,15 +18,9 @@ namespace Toe.ContentPipeline
             set
             {
                 var newId = EvaluateId(value);
-                if (_id == newId)
-                {
-                    return;
-                }
+                if (_id == newId) return;
 
-                if (_id != null)
-                {
-                    throw new InvalidOperationException("Can't change id. You can only set id once.");
-                }
+                if (_id != null) throw new InvalidOperationException("Can't change id. You can only set id once.");
 
                 _id = newId;
             }
